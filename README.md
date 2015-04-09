@@ -1,8 +1,8 @@
-# GMP, MPFR, Flint &amp; ARB for Windows
+# GMP, MPFR, FLINT &amp; ARB for Windows
 
 ## Introduction
 
-GMP, MPFR, Flint and ARB are numerical libraries for large integer and arbitrary precision arithmetic.
+GMP, MPFR, FLINT and ARB are numerical libraries for large integer and arbitrary precision floating point arithmetic.
 
 ## Environment
 
@@ -21,6 +21,7 @@ GMP, MPFR, Flint and ARB are numerical libraries for large integer and arbitrary
 ## Binaries
 
 /local/bin
+
 /local/lib
 
 ## Demo
