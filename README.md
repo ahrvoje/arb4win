@@ -26,7 +26,7 @@ GMP, MPFR, FLINT and ARB are numerical libraries for large integer and arbitrary
 
 ## Workflow
 
-ARBpackage.7z contains all sufficient material to simply build all static and dynamic libraries. After unpacking the archive in any desired folder, after starting msys.bat script one must simply execute the following command line in just started shell:
+ARBpackage.7z contains all sufficient material to simply build all static and dynamic libraries. After unpacking the archive in any desired folder, after starting msys.bat script one must simply execute the following command line:
 
 ```
 $ buildARB.sh
