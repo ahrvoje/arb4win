@@ -43,10 +43,10 @@ localeconv (void)
 
 ### ARB
 
-File **_arb-master/test/t-setstr.c_** was patched to avoid MinGW problem with conversion of inf/nan strings to float. Despite the fact that GCC converts "inf" & "nan" strings to INF & NAN doubles respectively, just as C standard states (e.g. ISO/IEC 9899:1999, sections 7.20.1.1 & 7.20.1.3), MinGW converts them to 0.0. This fact causes ARB's setstr test to always fail and stop the testing process.
+File **_arb-master/test/t-set_str.c_** was patched to avoid MinGW problem with conversion of inf/nan strings to float. Despite the fact that GCC converts "inf" & "nan" strings to INF & NAN doubles respectively, just as C standard states (e.g. ISO/IEC 9899:1999, sections 7.20.1.1 & 7.20.1.3), MinGW converts them to 0.0. This fact causes ARB's set_str test to always fail and stop the testing process.
 
 ```
-arb-master/test/t-setstr.c
+arb-master/test/t-set_str.c
 ln. 114-125
 
 /* this line added to avoid MinGW problem of atof("inf")=0.0 atof("nan")=0.0
