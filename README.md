@@ -101,9 +101,9 @@ $ buildARB.sh
 
 ## Demo
 
-In this demo it is shown how to calculate one simple approximation of natural constant **e** including its error. Internal computational precision is `p=10000`, which is way more than needed.
+In this demo it is shown how to calculate one simple approximation of natural constant **e** coorect to 46 decimal places. ARB also calculates accumulated numerical error so every result is printed as _ball__. Internal computational precision is set to `p=10000`, which is way more than needed.
 
-![equation](http://www.sciweavers.org/tex2img.php?eq=x%20%3D%20%20%5Cbig%281%20%2B%202%5E%7B-76%7D%20%5Cbig%29%20%5E%7B4%5E%7B38%7D%20%2B%200.5%7D&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)
+![equation](http://www.sciweavers.org/tex2img.php?eq=e%20%20%5Capprox%20x%20%3D%20%20a%5E%7Bb%7D%20%3D%20%5Cbig%281%20%2B%202%5E%7B-76%7D%20%5Cbig%29%20%5E%7B4%5E%7B38%7D%20%2B%200.5%7D&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)
 
 ```
 #include "arb.h"
@@ -111,6 +111,7 @@ In this demo it is shown how to calculate one simple approximation of natural co
 int main()
 {
 	long p = 10000;
+	long d = 50;
 	arb_t a, b, t;
 	
 	arb_init(a);
@@ -123,20 +124,20 @@ int main()
 	arb_pow(a, a, t, p);
 	arb_set_str(t, "1", p);
 	arb_add(a, t, a, p);
-	printf("a   = "); arb_printd(a, 100); printf("\n");
+	printf("a   = "); arb_printd(a, d); printf("\n");
 
 	// b = 4 ^ 38 + 0.5
 	arb_set_str(b, "0.5", p);
 	arb_ui_pow_ui(t, 4, 38, p);
 	arb_add(b, t, b, p);
-	printf("b   = "); arb_printd(b, 100); printf("\n");
+	printf("b   = "); arb_printd(b, d); printf("\n");
 
 	// the result: a = a ^ b
 	arb_pow(a, a, b, p);
-	printf("x   = "); arb_printd(a, 100); printf("\n");
+	printf("x   = "); arb_printd(a, d); printf("\n");
 	arb_const_e(t, p);
 	arb_sub(a, a, t, p);
-	printf("x-e = "); arb_printd(a, 100); printf("\n");
+	printf("x-e = "); arb_printd(a, d); printf("\n");
 
 	printf("Computed with arb-%s\n", arb_version);
 
@@ -155,6 +156,9 @@ And the result is:
 
 ```
 $ ./a.exe
-
-
+a   = 1.0000000000000000000000132348898008484427979425391 +/- 0
+b   = 75557863725914323419136.5 +/- 0
+x   = 2.7182818284590452353602874713526624977572470937396 +/- 6.0925e-3010
+x-e = 3.9678376581476207465438603498757884997818078351607e-47 +/- 8.0974e-3010
+Computed with arb-2.5.0
 ```
