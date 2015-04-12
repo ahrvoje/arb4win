@@ -6,17 +6,26 @@ GMP, MPFR, FLINT and ARB are numerical libraries for large integer and arbitrary
 
 ## Environment
 
-- MSYS 1.0
-- MSYS patch from 2012
-- MinGW in short
-- buildARB.sh
+- MSYS 1.0 including the following updates and additions:
+   - msysCORE v1.0.18
+   - bash v3.1.23
+   - grep v2.5.4-2
+   - make v3.81-3
+   - msys-regex-1.dll
+   - msys-termcap-0.dll
+   - msys-intl-8.dll
+   - msys-iconv-2.dll
+- Compiler info:
+   - gcc version v4.9.1 (i686-posix-dwarf-rev2, Built by MinGW-W64 project)
+   - target: i686-w64-mingw32
+   - thread model: posix
 
 ## Source
 
 - GMP v5.1.3
 - MPFR v3.1.2
 - FLINT 2.4.5
-- ARB v2.5.0+ (master branch head from 06.04.2015.)
+- ARB v2.5.0+ (master branch head from 06.04.2015)
 
 ## Patches
 
@@ -47,7 +56,7 @@ localeconv (void)
 
 File **_arb-master/test/t-set_str.c_** was patched to avoid MinGW problem with conversion of inf/nan strings to float. Despite the fact that GCC converts "inf"/"nan" strings to INF/NAN doubles, just as C standard states (e.g. ISO/IEC 9899:1999, sections 7.20.1.1 & 7.20.1.3), MinGW converts them to 0.0. This fact causes ARB's original version of set_str test to always fail and stop the testing process.
 
-Make sure you take this facts into consideration when you deserialize "inf"/"nan" strings using MinGW. This cases have to be handled with special care.
+Make sure you take this facts into consideration when you use `arb_set_str` or deserialize "inf"/"nan" strings under MinGW. This cases have to be handled with special care.
 
 ```
 arb-master/test/t-set_str.c
@@ -82,13 +91,70 @@ Once built, the following folders contain the files needed to use the libraries.
 
 ## Workflow
 
-ARB_MinGW_package.7z contains all sufficient material to simply build all static and dynamic libraries. After unpacking **_ARB_MinGW_package.7z_** archive, check and adapt COMPILER, HOST & BUILD (ln. 32-35 of /local/bin/*_buildARB.sh_*) according to your needs. Then after starting *_msys.bat_*, one must simply execute the following command line:
+**_ARB_MinGW_package.7z_** contains all sufficient material to simply build described static and dynamic libraries. After unpacking it, check and adapt `COMPILER`, `HOST` & `BUILD` variables in ln. 32-35 of /local/bin/*_buildARB.sh_* according to your needs. Then, after starting *_msys.bat_*, one must simply has to execute the following command line:
 
 ```
 $ buildARB.sh
 ```
 
-buildARB.sh performs the entire workflow with timing & log files written in /tmp folder. You can check on the process viewing them as they are appended by buildARB.sh script.
+**_buildARB.sh_** performs the entire workflow with timing & log files written in **_/tmp_** folder. You can check on the process viewing them as they are appended by **_buildARB.sh_** script.
 
 ## Demo
 
+In this demo it is shown how to calculate one simple approximation of natural constant **e** including its error. Internal computational precision is `p=10000`, which is way more than needed.
+
+![equation](http://www.sciweavers.org/tex2img.php?eq=x%20%3D%20%20%5Cbig%281%20%2B%202%5E%7B-76%7D%20%5Cbig%29%20%5E%7B4%5E%7B38%7D%20%2B%200.5%7D&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)
+
+```
+#include "arb.h"
+
+int main()
+{
+	long p = 10000;
+	arb_t a, b, t;
+	
+	arb_init(a);
+	arb_init(b);
+	arb_init(t);
+
+	// a = 1 + 2 ^ -76
+	arb_set_str(a, "2", p);
+	arb_set_str(t, "-76", p);
+	arb_pow(a, a, t, p);
+	arb_set_str(t, "1", p);
+	arb_add(a, t, a, p);
+	printf("a   = "); arb_printd(a, 100); printf("\n");
+
+	// b = 4 ^ 38 + 0.5
+	arb_set_str(b, "0.5", p);
+	arb_ui_pow_ui(t, 4, 38, p);
+	arb_add(b, t, b, p);
+	printf("b   = "); arb_printd(b, 100); printf("\n");
+
+	// the result: a = a ^ b
+	arb_pow(a, a, b, p);
+	printf("x   = "); arb_printd(a, 100); printf("\n");
+	arb_const_e(t, p);
+	arb_sub(a, a, t, p);
+	printf("x-e = "); arb_printd(a, 100); printf("\n");
+
+	printf("Computed with arb-%s\n", arb_version);
+
+	arb_clear(a);
+	arb_clear(b);
+	arb_clear(t);
+}
+```
+
+Demo is compiled executing the following command line (notice `-m32` switch):
+```
+$ g++ -m32 -I/local/include -I/local/include/flint -I/local/include/flintxx arb_demo.cpp -L/local/lib -larb -lflint -lmpfr -lgmp
+```
+
+And the result is:
+
+```
+$ ./a.exe
+
+
+```
