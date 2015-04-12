@@ -20,6 +20,49 @@ GMP, MPFR, FLINT and ARB are numerical libraries for large integer and arbitrary
 
 ## Patches
 
+### GMP
+
+File _gmp-5.1.3/tests/cxx/clocale.c_** was patched to avoid MinGW problem with redeclaration of `localeconv`. This patch enables an execution of a few tests which otherwise fail.
+
+```
+gmp-5.1.3/tests/cxx/clocale.c
+ln. 44-54
+
+#if !defined(__MINGW32__) // this line added to avoid redeclaration problem in MinGW
+#if HAVE_LOCALECONV
+struct lconv *
+localeconv (void)
+{
+   static struct lconv  l;
+   l.decimal_point = decimal_point;
+   return &l;
+}
+#endif
+#endif // this line added to avoid redeclaration problem in MinGW
+```
+
+### ARB
+
+File _arb-master/test/t-setstr.c_** was patched to avoid MinGW problem with conversion of inf/nan strings to float. Despite the fact that GCC converts "inf" & "nan" strings to INF & NAN doubles respectively, just as C standard states (e.g. ISO/IEC 9899:1999, sections 7.20.1.1 & 7.20.1.3), MinGW converts them to 0.0. This fact causes ARB's setstr test to always fail and stop the testing process.
+
+```
+arb-master/test/t-setstr.c
+ln. 114-125
+
+/* this line added to avoid MinGW problem of atof("inf")=0.0 atof("nan")=0.0
+    "inf",
+    "-inf",
+    "+inf",
+    "Inf",
+    "-INF",
+    "+Inf",
+
+    "NAN",
+    "-NaN",
+    "+NAN",
+*///  this line added to avoid MinGW problem of atof("inf")=0.0
+
+```
 ## Binaries
 
 /local/bin
