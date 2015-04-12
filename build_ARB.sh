@@ -21,12 +21,12 @@
 #      - thread model: posix
 #    GMP v5.1.3
 #      - GMP v6.0.0a was released, but there are still some issues regarding FLINT v2.4.5
-#      - patch: tests/cxx/clocale.c for redecaration of localeconv
+#      - patch: tests/cxx/clocale.c for redeclaration of localeconv
 #    MPFR v3.1.2
 #    FLINT v2.4.5
 #    ARB v2.5.0
 #      - master branch head from 06.04.2015
-#      - patch: arb/test/t-set_str.c
+#      - patch: arb/test/t-set_str.c for MinGW issue with atof("inf")=0.0 atof("nan")=0.0
 #
 
 # modify according to your setup and preferences
