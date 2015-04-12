@@ -74,7 +74,7 @@ Once built, the following folders contain the files needed to use the libraries.
 
 **_/local/bin_** contains shared libraries (**_libgmp-10.dll_**, **_libgmpxx-4.dll_**, **_libmpfr-4.dll_**, **_flint.dll_**, **_arb.dll_**).
 
-**_/local/lib_** contains static libraries for compiler and target defined in **_buildARB.sh_** script. I decided not to include them into this repository as everybody needs to build them using their own compiler and target anyways.
+**_/local/lib_** contains static libraries for compiler and target defined in **_buildARB.sh_** script. I decided not to include them into this repository as everybody needs to build them using their own compiler and target anyway.
 
 **_/local/include_** contains header files needed to build against static libraries.
 
@@ -82,7 +82,7 @@ Once built, the following folders contain the files needed to use the libraries.
 
 ## Workflow
 
-ARB_MinGW_package.7z contains all sufficient material to simply build all static and dynamic libraries. After unpacking the archive and starting msys.bat script, one must simply execute the following command line:
+ARB_MinGW_package.7z contains all sufficient material to simply build all static and dynamic libraries. After unpacking **_ARB_MinGW_package.7z_** archive, check and adapt COMPILER, HOST & BUILD (ln. 32-35 of /local/bin/*_buildARB.sh_*) according to your needs. Then after starting *_msys.bat_*, one must simply execute the following command line:
 
 ```
 $ buildARB.sh
