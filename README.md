@@ -2,13 +2,13 @@
 
 ## Introduction
 
-GMP, MPFR, FLINT and ARB are a well known numerical libraries for large integer and arbitrary precision floating point arithmetic. Special emphasis is give to a great ARB library for _ball arithmetic_ by Frederik Johansson.
+GMP, MPFR, FLINT and ARB are a well known numerical libraries for large integer and arbitrary precision floating point arithmetic. Special emphasis is given ARB library for _ball arithmetic_ by Frederik Johansson.
 
-This repository does not contribute to their functionalities but is a mere guide and resource container for porting to Windows.
+This repository does not contribute to their functionalities, but is a mere guide and resource container for porting to Windows.
 
 ## System and environment
 
-- Windows OS
+Used and included in **_ARB_MinGW_package.7z_**:
 - MSYS 1.0 including the following updates and additions:
    - msysCORE v1.0.18
    - bash v3.1.23
@@ -18,17 +18,24 @@ This repository does not contribute to their functionalities but is a mere guide
    - msys-termcap-0.dll
    - msys-intl-8.dll
    - msys-iconv-2.dll
+- build_ARB.sh
+
+Used, but not included in **_ARB_MinGW_package.7z_**:
+- Windows 7
 - Compiler info:
    - gcc version v4.9.1 (i686-posix-dwarf-rev2, Built by MinGW-W64 project)
    - target: i686-w64-mingw32
    - thread model: posix
-- build_ARB.sh
+
+MSYS including updates & add-ons and **_build_ARB.sh_** are included in **_ARB_MinGW_package.7z_**, while GCC and Windows (obviously!) are not. I assume you have your OS and compiler already installed and ready to go...
 
 Cygwin is not used as it does not handle symbolic links, used by some **configure** and **make** scripts, in a desirable way. MSYS solves this issue by implementing customized **ln** command which simply hard-copies the file.
 
-Libraries are not 64-bit Windows safe so the entire workflow is adapted to 32-bit building process (configuration parameter `ABI=32` is set for all libraries). Consequently, if building against the static libraries, `-m32` gcc/g++ switch sometimes has to be used to compile target applications, as shown in Demo section at the end of this page.
+The libraries are not 64-bit Windows safe so the entire workflow is adapted to 32-bit building process (configuration parameter `ABI=32` is set for all of them). Consequently, if one builds against the static libraries, `-m32` gcc/g++ switch sometimes has to be used to compile target applications, as shown in Demo section at the end of this page.
 
 ## Sources
+
+All sources, including a few patches, are part of **_ARB_MinGW_package.7z_**.
 
 - GMP v5.1.3 ([ftp://ftp.gnu.org/gnu/gmp/](ftp://ftp.gnu.org/gnu/gmp/))
 - MPFR v3.1.2 ([http://www.mpfr.org/mpfr-current/](http://www.mpfr.org/mpfr-current/))
@@ -42,7 +49,6 @@ The following two patches fix a few issues with some tests in GMP and ARB.
 #### GMP
 
 File **_gmp-5.1.3/tests/cxx/clocale.c_** was patched to avoid MinGW problem with redeclaration of `localeconv` method. This patch enables an execution of a few tests which otherwise fail, without influencing any numerical procedures or results.
-
 ```
 gmp-5.1.3/tests/cxx/clocale.c
 ln. 44-54
@@ -59,13 +65,11 @@ localeconv (void)
 #endif
 #endif // this line added to avoid redeclaration problem in MinGW
 ```
-
 #### ARB
 
 File **_arb-master/test/t-set_str.c_** was patched to avoid MinGW problem with conversion of inf/nan strings to float. Despite the fact that GCC converts "inf"/"nan" strings to INF/NAN doubles, just as C standard states (e.g. ISO/IEC 9899:1999, sections 7.20.1.1 & 7.20.1.3), MinGW converts them to 0.0. This fact causes ARB's original version of set_str test to always fail and stop the testing process.
 
 Make sure you take this facts into consideration when you use `arb_set_str` or deserialize "inf"/"nan" strings under MinGW. This cases have to be handled with special care.
-
 ```
 arb-master/test/t-set_str.c
 ln. 114-125
@@ -84,7 +88,6 @@ ln. 114-125
 *///  this line added to avoid MinGW problem of atof("inf")=0.0 atof("nan")=0.0
 
 ```
-
 ## Deliverables
 
 Once built, the following folders contain the files needed to use the libraries.
@@ -110,7 +113,6 @@ $ build_ARB.sh
 In this demo it is shown how to calculate one simple approximation of natural constant **e** correct to 46 decimal places. ARB also calculates accumulated numerical error so every result is printed as _ball__ containing the result with absolute certainty. Internal computational precision is set to `p=1000`, which is way more than needed.
 
 ![equation](approx.png)
-
 ```
 #include "arb.h"
 
