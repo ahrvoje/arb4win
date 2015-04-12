@@ -102,7 +102,7 @@ Once built, the following folders contain the files needed to use the libraries.
 
 ## Workflow
 
-**_ARB_MinGW_package.7z_** contains all sufficient material to build described static and dynamic libraries. After unpacking it, check and adapt `COMPILER`, `HOST` & `BUILD` variables at ln. 33-35 of **_/local/bin/_build_ARB.sh_** according to your needs. Then, after starting *_msys.bat_*, one simply has to execute the following command line and the build process will start:
+**_ARB_MinGW_package.7z_** contains all sufficient material to build described static and dynamic libraries. After unpacking it, check and adapt `COMPILER`, `HOST` & `BUILD` variables at ln. 33-35 of **_/local/bin/build_ARB.sh_** according to your needs. Then, after starting *_msys.bat_*, one simply has to execute the following command line and the build process will start:
 ```
 $ build_ARB.sh
 ```
