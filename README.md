@@ -67,7 +67,7 @@ localeconv (void)
 ```
 #### ARB
 
-File **_arb-master/test/t-set_str.c_** was patched to avoid MinGW problem with conversion of "inf"/"nan" strings to float. Despite the fact that GCC converts them to INF/NAN doubles, just as C standard states (e.g. ISO/IEC 9899:1999, sections 7.20.1.1 & 7.20.1.3), MinGW converts them to 0.0. This fact causes ARB's original version of set_str test to always fail and stop the testing process.
+File **_arb-master/test/t-set_str.c_** was patched to avoid MinGW problem with conversion of "inf"/"nan" strings to float. Despite the fact that GCC converts them to INF/NAN doubles, just as C standard states (e.g. ISO/IEC 9899:1999, sections 7.20.1.1 & 7.20.1.3), MinGW converts them to 0.0. This fact causes ARB's original version of **_t-set_str.c_** test to always fail and stop the testing process.
 
 Make sure you take this facts into consideration if you use `atof` or deserialize "inf"/"nan" strings under MinGW. This cases have to be handled separately.
 ```
@@ -105,7 +105,7 @@ Shared libraries are included in **DLLs** folder of this repository.
 
 1. **_ARB_MinGW_package.7z_** contains all sufficient material to build described static and dynamic libraries. Download it and unpack into any desired folder on your computer.
 2. Check and adapt `COMPILER`, `HOST` & `BUILD` variables at ln. 33-35 of **_/local/bin/build_ARB.sh_** according to your needs. Also, every library can be set to be build in static or shared form and checked by the available set of tests. One can control this by setting corresponding `BUILD_STATIC`, `BUILD_SHARED`, `CHECK_STATIC` & `CHECK_SHARED` variables to "yes"/"no" value at ln. 41-62 of **_build_ARB.sh_**.
-3. Finally, after starting *_msys.bat_*, one simply has to execute the following command line and the build process will start:
+3. Finally, after starting MSYS with **_msys.bat_**, one simply has to execute the following command line in MSYS shell and the build process will start:
 ```
 $ build_ARB.sh
 ```
