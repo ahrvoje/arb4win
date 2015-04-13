@@ -14,10 +14,10 @@ Used and included in **_ARB_MinGW_package.7z_**:
    - bash v3.1.23
    - grep v2.5.4-2
    - make v3.81-3
+   - msys-iconv-2.dll
+   - msys-intl-8.dll
    - msys-regex-1.dll
    - msys-termcap-0.dll
-   - msys-intl-8.dll
-   - msys-iconv-2.dll
 - build_ARB.sh
 
 Used, but not included in **_ARB_MinGW_package.7z_**:
@@ -44,7 +44,7 @@ All sources, including a few patches, are part of **_ARB_MinGW_package.7z_**.
 
 ## Patches
 
-The following two patches fix a few issues with some tests in GMP and ARB.
+The following two patches fix a few issues with some tests in GMP and ARB. They are already applied to source in **_ARB_MinGW_package.7z_**. Now all tests for all libraries would have to pass.
 
 #### GMP
 
@@ -93,9 +93,9 @@ Once built, the following folders contain the files needed to use the libraries.
 
 **_/local/bin_** contains shared libraries (**_libgmp-10.dll_**, **_libgmpxx-4.dll_**, **_libmpfr-4.dll_**, **_flint.dll_**, **_arb.dll_**).
 
-**_/local/lib_** contains static libraries for compiler and target defined in **_build_ARB.sh_**. I decided not to include them in ARB_MinGW_package as everybody needs to build them using their own compiler and target anyway.
+**_/local/lib_** contains static libraries for compiler and target defined in **_build_ARB.sh_**. I decided not to include them in **_ARB_MinGW_package.7z_** as everybody needs to build them using their own compiler and target anyway.
 
-**_/local/include_** contains header files needed to build against static libraries, also not included in ARB_MinGW_package.
+**_/local/include_** contains header files needed to build against static libraries, also not included in **_ARB_MinGW_package.7z_**.
 
 **_/local/shared_** contains some documentation automatically generated during the build process.
 
@@ -105,17 +105,17 @@ Shared libraries are included in **DLLs** folder of this repository.
 
 **_ARB_MinGW_package.7z_** contains all sufficient material to build described static and dynamic libraries.
 
-After unpacking it, check and adapt `COMPILER`, `HOST` & `BUILD` variables at ln. 33-35 of **_/local/bin/build_ARB.sh_** according to your needs. Also, every library can be set to be build in static or shared form and checked by available set of tests. One can control this by setting corresponding `BUILD_STATIC`, `BUILD_SHARED`, `CHECK_STATIC` & `CHECK_SHARED` variables to "yes"/"no" value at ln. 41-62 of **_build_ARB.sh_**.
+After unpacking it, check and adapt `COMPILER`, `HOST` & `BUILD` variables at ln. 33-35 of **_/local/bin/build_ARB.sh_** according to your needs. Also, every library can be set to be build in static or shared form and checked by the available set of tests. One can control this by setting corresponding `BUILD_STATIC`, `BUILD_SHARED`, `CHECK_STATIC` & `CHECK_SHARED` variables to "yes"/"no" value at ln. 41-62 of **_build_ARB.sh_**.
 
 Finally, after starting *_msys.bat_*, one simply has to execute the following command line and the build process will start:
 ```
 $ build_ARB.sh
 ```
-**_build_ARB.sh_** performs the entire workflow with timing & log files written to **_/tmp_** folder. You can check on the process viewing them as they are appended by **_build_ARB.sh_**.
+**_build_ARB.sh_** automatically executes the entire workflow with timing & log files written to **_/tmp_** folder. You can check on the process viewing them as they are appended by **_build_ARB.sh_**.
 
 ## Demo
 
-In this demo it is shown how to calculate one simple approximation of natural constant **e** correct to 46 decimal places. ARB also calculates accumulated numerical error so every result is printed as _ball_ containing the result with absolute certainty. Internal computational precision is set to `p=1000`, which is way more than needed.
+In this demo it is shown how to evaluate one simple approximation of natural constant **e** correct to 46 decimal places. ARB also calculates accumulated numerical error so every result is printed as _ball_ containing the result with absolute certainty. Internal computational precision is set to `p=1000`, way more than needed.
 
 ![equation](approx.png)
 ```
