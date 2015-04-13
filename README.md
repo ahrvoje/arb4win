@@ -116,7 +116,7 @@ $ build_ARB.sh
 
 ## Demo
 
-In this demo it is shown how to calculate one simple approximation of natural constant **e** correct to 46 decimal places. ARB also calculates accumulated numerical error so every result is printed as _ball__ containing the result with absolute certainty. Internal computational precision is set to `p=1000`, which is way more than needed.
+In this demo it is shown how to calculate one simple approximation of natural constant **e** correct to 46 decimal places. ARB also calculates accumulated numerical error so every result is printed as _ball_ containing the result with absolute certainty. Internal computational precision is set to `p=1000`, which is way more than needed.
 
 ![equation](approx.png)
 ```
