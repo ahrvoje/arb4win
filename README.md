@@ -103,8 +103,8 @@ Shared libraries are included in **DLLs** folder of this repository.
 
 ## Workflow
 
-1. **_ARB_MinGW_package.7z_** contains all sufficient material to build described static and dynamic libraries. Download it and unpack into any desired folder on your computer.
-2. Check and adapt `COMPILER`, `HOST` & `BUILD` variables at ln. 33-35 of **_/local/bin/build_ARB.sh_** according to your needs. Also, every library can be set to be build in static or shared form and checked by the available set of tests. One can control this by setting corresponding `BUILD_STATIC`, `BUILD_SHARED`, `CHECK_STATIC` & `CHECK_SHARED` variables to "yes"/"no" value at ln. 41-62 of **_build_ARB.sh_**.
+1. **_ARB_MinGW_package.7z_** contains all sufficient material to build described static and dynamic libraries. Download and unpack it into any desired folder.
+2. Check and adapt `COMPILER`, `HOST` & `BUILD` variables at ln. 33-35 of **_/local/bin/build_ARB.sh_** according to your setting and preferences. Also, every library can be set to be build in static or shared form and checked by the available set of tests. One can control this by setting corresponding `BUILD_STATIC`, `BUILD_SHARED`, `CHECK_STATIC` & `CHECK_SHARED` variables to "yes"/"no" value at ln. 41-62 of **_build_ARB.sh_**.
 3. Finally, after starting MSYS with **_msys.bat_**, one simply has to execute the following command line in MSYS shell and the build process will start:
 ```
 $ build_ARB.sh
