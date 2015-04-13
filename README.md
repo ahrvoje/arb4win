@@ -39,7 +39,7 @@ All sources, including a few patches, are part of **_ARB_MinGW_package.7z_**.
 
 - GMP v5.1.3 ([ftp://ftp.gnu.org/gnu/gmp/](ftp://ftp.gnu.org/gnu/gmp/))
 - MPFR v3.1.2 ([http://www.mpfr.org/mpfr-current/](http://www.mpfr.org/mpfr-current/))
-- FLINT 2.4.5 ([http://flintlib.org/downloads.html](http://flintlib.org/downloads.html))
+- FLINT v2.4.5 ([http://flintlib.org/downloads.html](http://flintlib.org/downloads.html))
 - ARB v2.5.0+ - master branch head from 06.04.2015 ([https://github.com/fredrik-johansson/arb/](https://github.com/fredrik-johansson/arb/))
 
 ## Patches
