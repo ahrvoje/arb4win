@@ -113,7 +113,7 @@ $ build_ARB.sh
 
 ## Demo
 
-In this demo we evaluate one simple approximation of natural constant **e** correct to 46 decimal places. ARB also calculates accumulated numerical error so every result is printed as _ball_ containing the result with absolute certainty. Internal computational precision is set to `p=1000`, way more than needed.
+In this demo we evaluate one simple pandigital approximation of natural constant **e** correct to 46 decimal places. ARB also calculates accumulated numerical error so every result is printed as _ball_ containing the result with absolute certainty. Internal computational precision is set to `p=1000`, way more than needed.
 
 ![equation](approx.png)
 ```
