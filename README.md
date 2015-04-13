@@ -86,7 +86,6 @@ ln. 114-125
     "-NaN",
     "+NAN",
 *///  this line added to avoid MinGW problem of atof("inf")=0.0 atof("nan")=0.0
-
 ```
 ## Deliverables
 
