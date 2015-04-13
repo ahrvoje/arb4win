@@ -2,7 +2,7 @@
 
 ## Introduction
 
-GMP, MPFR, FLINT and ARB are well known numerical libraries for large integer and arbitrary precision floating point arithmetic. A special emphasis is given to _ball arithmetic_ **ARB library** by Frederik Johansson.
+GMP, MPFR, FLINT and ARB are well known numerical libraries for large integer and arbitrary precision floating point arithmetic. A special emphasis is given to _ball arithmetic_ library **ARB** by Frederik Johansson.
 
 This repository does not contribute to their functionalities, but is a mere guide and resource container for porting to Windows.
 
@@ -162,7 +162,7 @@ int main()
 	arb_clear(t);
 }
 ```
-Demo is compiled by the following command line. Notice `-m32` switch, although it turns out the demo works without using it as well.
+Demo is compiled by the following command line. Notice `-m32` switch, although it turns out the demo works without it as well.
 ```
 $ g++ -m32 -I/local/include -I/local/include/flint -I/local/include/flintxx arb_demo.cpp -L/local/lib -larb -lflint -lmpfr -lgmp
 ```
