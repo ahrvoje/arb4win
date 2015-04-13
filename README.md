@@ -2,7 +2,7 @@
 
 ## Introduction
 
-GMP, MPFR, FLINT and ARB are well known numerical libraries for large integer and arbitrary precision floating point arithmetic. A special emphasis is given to _ball arithmetic_ library **ARB** by Frederik Johansson.
+GMP, MPFR, FLINT and ARB are well known numerical libraries for large integer and arbitrary precision floating point arithmetic. A special emphasis is given to _ball arithmetic_ library [ARB](https://github.com/fredrik-johansson/arb/) by Frederik Johansson.
 
 This repository does not contribute to their functionalities, but is a mere guide and resource container for porting to Windows.
 
@@ -31,7 +31,7 @@ MSYS including updates & add-ons and **_build_ARB.sh_** are included in **_ARB_M
 
 Cygwin is not used as it does not handle symbolic links, used by some **configure** and **make** scripts, in a desirable way. MSYS solves this issue by implementing customized **ln** command which simply hard-copies the file.
 
-The libraries are not 64-bit Windows safe so the entire workflow is adapted to 32-bit building process (configuration parameter `ABI=32` is set for all of them). Consequently, if one builds against the static libraries, `-m32` gcc/g++ switch sometimes has to be used to compile target applications, as shown in Demo section at the end of this page.
+The libraries are not 64-bit Windows safe so the entire workflow is adapted to 32-bit building process (configuration parameter `ABI=32` is set for all of them). Consequently, if one builds against the static libraries, `-m32` gcc/g++ switch sometimes has to be used to compile target application, as shown in Demo section at the end of this page.
 
 ## Sources
 
@@ -44,7 +44,7 @@ All sources, including a few patches, are part of **_ARB_MinGW_package.7z_**.
 
 ## Patches
 
-The following two patches fix a few issues with some tests in GMP and ARB. They are already applied to source in **_ARB_MinGW_package.7z_**. Now all tests for all libraries would have to pass.
+The following two patches fix a few issues with some tests in GMP and ARB. They are already applied to the source in **_ARB_MinGW_package.7z_**. Now all tests for all libraries pass.
 
 #### GMP
 
@@ -103,11 +103,9 @@ Shared libraries are included in **DLLs** folder of this repository.
 
 ## Workflow
 
-**_ARB_MinGW_package.7z_** contains all sufficient material to build described static and dynamic libraries.
-
-After unpacking it, check and adapt `COMPILER`, `HOST` & `BUILD` variables at ln. 33-35 of **_/local/bin/build_ARB.sh_** according to your needs. Also, every library can be set to be build in static or shared form and checked by the available set of tests. One can control this by setting corresponding `BUILD_STATIC`, `BUILD_SHARED`, `CHECK_STATIC` & `CHECK_SHARED` variables to "yes"/"no" value at ln. 41-62 of **_build_ARB.sh_**.
-
-Finally, after starting *_msys.bat_*, one simply has to execute the following command line and the build process will start:
+1. **_ARB_MinGW_package.7z_** contains all sufficient material to build described static and dynamic libraries. Download it and unpack into any desired folder on your computer.
+2. Check and adapt `COMPILER`, `HOST` & `BUILD` variables at ln. 33-35 of **_/local/bin/build_ARB.sh_** according to your needs. Also, every library can be set to be build in static or shared form and checked by the available set of tests. One can control this by setting corresponding `BUILD_STATIC`, `BUILD_SHARED`, `CHECK_STATIC` & `CHECK_SHARED` variables to "yes"/"no" value at ln. 41-62 of **_build_ARB.sh_**.
+3. Finally, after starting *_msys.bat_*, one simply has to execute the following command line and the build process will start:
 ```
 $ build_ARB.sh
 ```
@@ -115,7 +113,7 @@ $ build_ARB.sh
 
 ## Demo
 
-In this demo it is shown how to evaluate one simple approximation of natural constant **e** correct to 46 decimal places. ARB also calculates accumulated numerical error so every result is printed as _ball_ containing the result with absolute certainty. Internal computational precision is set to `p=1000`, way more than needed.
+In this demo we evaluate one simple approximation of natural constant **e** correct to 46 decimal places. ARB also calculates accumulated numerical error so every result is printed as _ball_ containing the result with absolute certainty. Internal computational precision is set to `p=1000`, way more than needed.
 
 ![equation](approx.png)
 ```
