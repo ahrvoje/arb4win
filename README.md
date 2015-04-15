@@ -111,7 +111,7 @@ $ build_ARB.sh
 ```
 **_build_ARB.sh_** automatically executes the entire workflow with timing & log files written to **_/tmp_** folder. You can check on the process viewing them as they are appended by **_build_ARB.sh_**.
 
-Applications built using **_arb_** and **_flint_** static libraries expect to find **_libgmp-10.dll_** and **_libmpfr-4.dll_** libraries in system **_PATH_**. Please make sure this is the case.
+Applications built using **_arb_** and **_flint_** static libraries expect to find **_libgmp-10.dll_** and **_libmpfr-4.dll_** in system **_PATH_**. Please make sure this is the case.
 ## Demo
 
 In this demo we evaluate one simple pandigital approximation of natural constant **e** correct to 46 decimal places. ARB also calculates accumulated numerical error so every result is printed as _ball_ containing the result with absolute certainty. Internal computational precision is set to `p=1000`, way more than needed.
@@ -165,7 +165,7 @@ Demo is compiled by the following command line. Notice `-m32` switch, although i
 ```
 $ g++ -m32 -I/local/include -I/local/include/flint -I/local/include/flintxx arb_demo.cpp -L/local/lib -larb -lflint -lmpfr -lgmp
 ```
-Before starting the application make sure **_libgmp-10.dll_** and **_libmpfr-4.dll_** libraries are in system **_PATH_**. And the result is:
+Before starting the application make sure **_libgmp-10.dll_** and **_libmpfr-4.dll_** are in system **_PATH_**. And the result is:
 ```
 $ ./a.exe
 a   = 1.0000000000000000000000132348898008484427979425390731 +/- 0
