@@ -9,48 +9,36 @@ This repository does not contribute to their functionalities, but is a mere guid
 ## System and environment
 
 Used and included in **_ARB_MinGW_package.7z_**:
-- MSYS 1.0 including the following updates and additions:
-   - msysCORE v1.0.18
-   - bash v3.1.23
-   - grep v2.5.4-2
-   - make v3.81-3
-   - msys-iconv-2.dll
-   - msys-intl-8.dll
-   - msys-regex-1.dll
-   - msys-termcap-0.dll
+- MSYS2 installer
+- sources with patched tests in /local/src folder:
+   - GMP v6.0.0a ([ftp://ftp.gnu.org/gnu/gmp/](ftp://ftp.gnu.org/gnu/gmp/))
+   - MPFR v3.1.3 ([http://www.mpfr.org/mpfr-current/](http://www.mpfr.org/mpfr-current/))
+   - FLINT v2.5.2 ([http://flintlib.org/downloads.html](http://flintlib.org/downloads.html))
+   - ARB v2.7.0+ (commit aaa4d86) ([https://github.com/fredrik-johansson/arb/](https://github.com/fredrik-johansson/arb/))
 - build_ARB.sh
+   - script will install 'make' and 'diffutils' MSYS2 packages if missing
 
 Used, but not included in **_ARB_MinGW_package.7z_**:
 - Windows 7
 - Compiler info:
-   - gcc version v4.9.1 (i686-posix-dwarf-rev2, Built by MinGW-W64 project)
+   - gcc version v4.9.2 (i686-posix-dwarf-rev2, Built by MinGW-W64 project)
    - target: i686-w64-mingw32
    - thread model: posix
+   - build into Qt 5.5.0
 
-MSYS including updates & add-ons and **_build_ARB.sh_** are included in **_ARB_MinGW_package.7z_**, while GCC and Windows (obviously!) are not. I assume you have your OS and compiler already installed and ready to go...
-
-Cygwin is not used as it does not handle symbolic links, used by some **configure** and **make** scripts, in a desirable way. MSYS solves this issue by implementing customized **ln** command which simply hard-copies the file.
+Cygwin is not used as it does not handle symbolic links, used by some **configure** and **make** scripts, in a desirable way. MSYS2 solves this issue by implementing customized **ln** command which simply hard-copies the file.
 
 The libraries are not 64-bit Windows safe so the entire workflow is adapted to 32-bit building process (configuration parameter `ABI=32` is set for all of them). Consequently, if one builds against the static libraries, `-m32` gcc/g++ switch sometimes has to be used to compile target application, as shown in Demo section at the end of this page.
 
-## Sources
-
-All sources, including a few patches, are part of **_ARB_MinGW_package.7z_**.
-
-- GMP v5.1.3 ([ftp://ftp.gnu.org/gnu/gmp/](ftp://ftp.gnu.org/gnu/gmp/))
-- MPFR v3.1.2 ([http://www.mpfr.org/mpfr-current/](http://www.mpfr.org/mpfr-current/))
-- FLINT v2.4.5 ([http://flintlib.org/downloads.html](http://flintlib.org/downloads.html))
-- ARB v2.5.0+ - master branch head from 06.04.2015 ([https://github.com/fredrik-johansson/arb/](https://github.com/fredrik-johansson/arb/))
-
 ## Patches
 
-The following two patches fix a few issues with some tests in GMP and ARB. They are already applied to the source in **_ARB_MinGW_package.7z_**. Now all tests for all libraries pass.
+The following two patches fix a few issues with some tests in GMP and ARB. They are already applied to the source in **_ARB_MinGW_package.7z_**.
 
 #### GMP
 
-File **_gmp-5.1.3/tests/cxx/clocale.c_** was patched to avoid MinGW problem with redeclaration of `localeconv` method. This patch enables an execution of a few tests which otherwise fail, without influencing any numerical procedures or results.
+File **_gmp-6.0.0/tests/cxx/clocale.c_** was patched to avoid MinGW problem with redeclaration of `localeconv` method. This patch enables an execution of a few tests which otherwise fail, without influencing any numerical procedures or results.
 ```
-gmp-5.1.3/tests/cxx/clocale.c
+gmp-6.0.0/tests/cxx/clocale.c
 ln. 44-54
 
 #if !defined(__MINGW32__) // this line added to avoid redeclaration problem in MinGW
@@ -71,10 +59,11 @@ File **_arb-master/test/t-set_str.c_** was patched to avoid MinGW problem with c
 
 Make sure you take this facts into consideration if you use `atof` or deserialize "inf"/"nan" strings under MinGW. This cases have to be handled separately.
 ```
-arb-master/test/t-set_str.c
-ln. 114-125
+arb-master/arb/test/t-set_str.c
+ln. 115-127
 
-/* this line added to avoid MinGW problem of atof("inf")=0.0 atof("nan")=0.0
+    /* PATCH!: this block is commented out to avoid MinGW problem with atof("inf")=0.0 atof("nan")=0.0 */
+    /*
     "inf",
     "-inf",
     "+inf",
@@ -85,7 +74,7 @@ ln. 114-125
     "NAN",
     "-NaN",
     "+NAN",
-*///  this line added to avoid MinGW problem of atof("inf")=0.0 atof("nan")=0.0
+    */
 ```
 ## Deliverables
 
@@ -95,7 +84,7 @@ Once built, the following folders contain the files needed to use the libraries.
 
 **_/local/lib_** contains static libraries for compiler and target defined in **_build_ARB.sh_**. I decided not to include them in **_ARB_MinGW_package.7z_** as everybody needs to build them using their own compiler and target anyway.
 
-**_/local/include_** contains header files needed to build against static libraries, also not included in **_ARB_MinGW_package.7z_**.
+**_/local/include_** contains header files needed to build against the static libraries, also not included in **_ARB_MinGW_package.7z_**.
 
 **_/local/shared_** contains some documentation automatically generated during the build process.
 
@@ -104,8 +93,8 @@ Shared libraries are included in **DLLs** folder of this repository.
 ## Workflow
 
 1. **_ARB_MinGW_package.7z_** contains all sufficient material to build described static and dynamic libraries. Download and unpack it into any desired folder.
-2. Check and adapt `COMPILER`, `HOST` & `BUILD` variables at ln. 33-35 of **_/local/bin/build_ARB.sh_** according to your setting and preferences. Also, every library can be set to be build in static or shared form and checked by the available set of tests. One can control this by setting corresponding `BUILD_STATIC`, `BUILD_SHARED`, `CHECK_STATIC` & `CHECK_SHARED` variables to "yes"/"no" value at ln. 41-62 of **_build_ARB.sh_**.
-3. Finally, after starting MSYS with **_msys.bat_**, one simply has to execute the following command line in MSYS shell and the build process will start:
+2. Check and adapt `COMPILER`, `HOST` & `BUILD` variables at ln. 27-29 of **_/local/bin/build_ARB.sh_** according to your setting and preferences. Also, every library can be set to be build in static or shared form and checked by the available set of tests. One can control this by setting corresponding `ERASE`, `BUILD`, `CHECK` & `CLEAN` variables to "yes"/"no" value at ln. 34-56 of **_build_ARB.sh_**.
+3. Finally, after starting MSYS2 with **_msys.bat_**, one simply has to execute the following command line in MSYS2 shell and the build process will start:
 ```
 $ build_ARB.sh
 ```
@@ -173,5 +162,5 @@ b   = 75557863725914323419136.5 +/- 0
 x   = 2.718281828459045235360287471352662497757247093739638 +/- 1.1407e-300
 e   = 2.7182818284590452353602874713526624977572470936999596 +/- 3.7331e-301
 x-e = 3.9678376581476207465438603498757884997818078351607135e-47 +/- 1.514e-300
-Computed with arb-2.5.0
+Computed with arb-2.7.0
 ```
