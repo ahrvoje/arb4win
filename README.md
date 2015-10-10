@@ -10,12 +10,13 @@ This repository does not contribute to their functionalities, but is a mere guid
 
 Used and included in **_ARB_MinGW_package.7z_**:
 - MSYS2 installer
-- sources with patched tests in /local/src folder:
+- make 4.1-4 and diffutils 3.3-3 pacman packages
+- sources with patched tests in **_/local/src_** folder:
    - GMP v6.0.0a ([ftp://ftp.gnu.org/gnu/gmp/](ftp://ftp.gnu.org/gnu/gmp/))
    - MPFR v3.1.3 ([http://www.mpfr.org/mpfr-current/](http://www.mpfr.org/mpfr-current/))
    - FLINT v2.5.2 ([http://flintlib.org/downloads.html](http://flintlib.org/downloads.html))
    - ARB v2.7.0+ (commit aaa4d86) ([https://github.com/fredrik-johansson/arb/](https://github.com/fredrik-johansson/arb/))
-- build_ARB.sh
+- build_ARB.sh in **_local/bin_**
    - script will install 'make' and 'diffutils' MSYS2 packages if missing
 
 Used, but not included in **_ARB_MinGW_package.7z_**:
@@ -24,7 +25,7 @@ Used, but not included in **_ARB_MinGW_package.7z_**:
    - gcc version v4.9.2 (i686-posix-dwarf-rev2, Built by MinGW-W64 project)
    - target: i686-w64-mingw32
    - thread model: posix
-   - build into Qt 5.5.0
+   - built into Qt 5.5.0
 
 Cygwin is not used as it does not handle symbolic links, used by some **configure** and **make** scripts, in a desirable way. MSYS2 solves this issue by implementing customized **ln** command which simply hard-copies the file.
 
@@ -41,7 +42,7 @@ File **_gmp-6.0.0/tests/cxx/clocale.c_** was patched to avoid MinGW problem with
 gmp-6.0.0/tests/cxx/clocale.c
 ln. 44-54
 
-#if !defined(__MINGW32__) // this line added to avoid redeclaration problem in MinGW
+#if !defined(__MINGW32__) /* PATCH!: this line added to avoid redeclaration problem in MinGW */
 #if HAVE_LOCALECONV
 struct lconv *
 localeconv (void)
@@ -51,7 +52,7 @@ localeconv (void)
    return &l;
 }
 #endif
-#endif // this line added to avoid redeclaration problem in MinGW
+#endif /* PATCH!: this line added to avoid redeclaration problem in MinGW */
 ```
 #### ARB
 
