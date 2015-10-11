@@ -81,9 +81,9 @@ Once built, the following folders contain the files needed to use the libraries.
 
 **_/local/bin_** contains shared libraries (**_libgmp-10.dll_**, **_libgmpxx-4.dll_**, **_libmpfr-4.dll_**, **_flint.dll_**, **_arb.dll_**). They are also included in **DLLs** folder of this repository.
 
-**_/local/lib_** contains static libraries for compiler and target defined in **_build_ARB.sh_**. I decided not to include them in **_ARB_for_MinGW.7z_** as everybody needs to build them using their own compiler and target anyway.
-
 **_/local/include_** contains header files needed to build against the static libraries, also not included in **_ARB_for_MinGW.7z_**.
+
+**_/local/lib_** contains static libraries for compiler and target defined in **_build_ARB.sh_**. I decided not to include them in **_ARB_for_MinGW.7z_** as everybody needs to build them using their own compiler and target anyway.
 
 **_/local/shared_** contains some documentation automatically generated during the build process.
 
