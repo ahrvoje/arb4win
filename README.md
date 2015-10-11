@@ -75,18 +75,6 @@ ln. 115-127
     "+NAN",
     */
 ```
-## Deliverables
-
-Once built, the following folders contain the files needed to use the libraries.
-
-**_/local/bin_** contains shared libraries (**_libgmp-10.dll_**, **_libgmpxx-4.dll_**, **_libmpfr-4.dll_**, **_flint.dll_**, **_arb.dll_**). They are also included in **DLLs** folder of this repository.
-
-**_/local/include_** contains header files needed to build against the static libraries, not included in **_ARB_for_MinGW.7z_**.
-
-**_/local/lib_** contains static libraries for compiler and target defined in **_build_ARB.sh_**. I decided not to include them in **_ARB_for_MinGW.7z_** as everybody needs to build them using their own compiler and target anyway.
-
-**_/local/shared_** contains some documentation automatically generated during build process.
-
 ## Workflow
 
 1. **_ARB_for_MinGW.7z_** contains all sufficient material to build described static and dynamic libraries. Download and unpack it into any desired folder.
@@ -98,6 +86,17 @@ $ /local/bin/build_ARB.sh
 **_build_ARB.sh_** automatically executes the entire workflow with timing & log files written to **_/var/log_** folder.
 
 Applications built using **_arb_** and **_flint_** static libraries expect to find **_libgmp-10.dll_** and **_libmpfr-4.dll_** in local folder or system **_PATH_**.
+## Deliverables
+
+Once built, the following folders contain the files needed to use the libraries.
+
+**_/local/bin_** contains shared libraries (**_libgmp-10.dll_**, **_libgmpxx-4.dll_**, **_libmpfr-4.dll_**, **_flint.dll_**, **_arb.dll_**). They are also included in **DLLs** folder of this repository.
+
+**_/local/include_** contains header files needed to build against the static libraries, not included in **_ARB_for_MinGW.7z_**.
+
+**_/local/lib_** contains static libraries for compiler and target defined in **_build_ARB.sh_**. I decided not to include them in **_ARB_for_MinGW.7z_** as everybody needs to build them using their own compiler and target anyway.
+
+**_/local/shared_** contains some documentation automatically generated during build process.
 ## Demo
 
 In this demo we evaluate one simple _pandigital approximation_ of natural constant **e** correct to 46 decimal places. ARB also calculates accumulated numerical error so every result is printed as _ball_ containing the result with absolute certainty. Internal computational precision is set to `p=1000`, way more than needed.
