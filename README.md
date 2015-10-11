@@ -54,12 +54,12 @@ localeconv (void)
 ```
 #### ARB
 
-File **_arb-master/arb/test/t-set_str.c_** was patched to avoid MinGW problem with conversion of "inf"/"nan" strings to float. Despite the fact that GCC converts them to INF/NAN doubles, just as C standard states (e.g. ISO/IEC 9899:1999, sections 7.20.1.1 & 7.20.1.3), MinGW converts them to 0.0. This fact causes ARB's original version of **_t-set_str.c_** test to fail and stop the testing process.
+File **_arb-master/arb/test/t-set_str.c_** was patched to avoid MinGW problem with `atof(...)` conversion of `"inf"`/`"nan"` strings to float. Despite the fact that GCC converts them into inf/quiet-NaN doubles, just as C standard states (e.g. ISO/IEC 9899:1999, sections 7.20.1.1 & 7.20.1.3), MinGW `atof("inf")` returns `0.0`. This fact causes ARB's original version of **_t-set_str.c_** test to fail and stop the testing process.
 
-Make sure you take this facts into consideration if you use `atof` or deserialize "inf"/"nan" strings under MinGW. This cases have to be handled in a special manner.
+Make sure you take this facts into consideration if you use `atof` or deserialize `"inf"`/`"nan"` strings under MinGW. This cases have to be handled in a special manner. Here we use `strtod(s, NULL)` instead which has ISO-C compliant functionality equivalent to `atof(s)`.
 ```
---- /d/repos/github/arb4win32/msys64/local/src/arb-master/arb/test/t-set_str.c 2                         015-10-11 20:22:41.599262200 +0200
-+++ /d/repos/github/arb/arb/test/t-set_str.c    2015-10-11 20:03:03.894901400 +0                         200
+--- arb4win32/msys64/local/src/arb-master/arb/test/t-set_str.c 2015-10-11 20:22:41.599262200 +0200
++++ arb/arb/test/t-set_str.c    2015-10-11 20:03:03.894901400 +0200
 @@ -184,7 +184,7 @@
 
          error = arb_set_str(t, testdata_floats[i], 53);
