@@ -15,7 +15,7 @@ Used and included in **_ARB_for_MinGW.7z_**:
    - MPFR v3.1.3 ([http://www.mpfr.org/mpfr-current/](http://www.mpfr.org/mpfr-current/))
    - FLINT v2.5.2 ([http://flintlib.org/downloads.html](http://flintlib.org/downloads.html))
    - ARB v2.7.0+ (commit aaa4d86) ([https://github.com/fredrik-johansson/arb/](https://github.com/fredrik-johansson/arb/))
-- **_build_ARB.sh_** in **_local/bin_**
+- **_build_ARB.sh_** in **_/local/bin_**
 
 Used, but not included in **_ARB_for_MinGW.7z_**:
 - Windows 7
