@@ -8,32 +8,30 @@ This repository does not contribute to their functionalities, but is a mere guid
 
 ## System and environment
 
-Used and included in **_ARB_MinGW_package.7z_**:
-- minimized MSYS2 based environment
-- **make 4.1-4** and **diffutils 3.3-3** MSYS2 packages (included into min. env.)
+Used and included in **_ARB_for_MinGW.7z_**:
+- reduced MSYS2 environment including **make 4.1-4** and **diffutils 3.3-3**
 - sources with patched tests in **_/local/src_** folder:
    - GMP v6.0.0a ([ftp://ftp.gnu.org/gnu/gmp/](ftp://ftp.gnu.org/gnu/gmp/))
    - MPFR v3.1.3 ([http://www.mpfr.org/mpfr-current/](http://www.mpfr.org/mpfr-current/))
    - FLINT v2.5.2 ([http://flintlib.org/downloads.html](http://flintlib.org/downloads.html))
    - ARB v2.7.0+ (commit aaa4d86) ([https://github.com/fredrik-johansson/arb/](https://github.com/fredrik-johansson/arb/))
 - **_build_ARB.sh_** in **_local/bin_**
-   - script will install **make** and **diffutils** MSYS2 packages if missing
 
-Used, but not included in **_ARB_MinGW_package.7z_**:
+Used, but not included in **_ARB_for_MinGW.7z_**:
 - Windows 7
-- Compiler info:
+- gcc compiler:
    - gcc version v4.9.2 (i686-posix-dwarf-rev2, Built by MinGW-W64 project)
    - target: i686-w64-mingw32
    - thread model: posix
    - used as part of Qt 5.5.0
 
-Cygwin is not used as it does not handle symbolic links, used by some **configure** and **make** scripts, in a desirable way. MSYS2 solves this issue by implementing customized **ln** command which simply hard-copies the file.
+Cygwin is not used as it does not handle symbolic links used by some **configure** and **make** scripts in a desirable way. MSYS2 solves this issue by implementing customized **ln** command which simply hard-copies the file.
 
 The libraries are not 64-bit Windows safe so the entire workflow is adapted to 32-bit building process (configuration parameter `ABI=32` is set for all of them). Consequently, if one builds against the static libraries, `-m32` gcc/g++ switch sometimes has to be used to compile target application, as shown in Demo section at the end of this page.
 
 ## Patches
 
-The following two patches fix a few issues with some tests in GMP and ARB. They are already applied to the source in **_ARB_MinGW_package.7z_**.
+The following two patches fix a few issues with some tests in GMP and ARB. They are already applied to the source in **_ARB_for_MinGW.7z_**.
 
 #### GMP
 
@@ -81,27 +79,25 @@ ln. 115-127
 
 Once built, the following folders contain the files needed to use the libraries.
 
-**_/local/bin_** contains shared libraries (**_libgmp-10.dll_**, **_libgmpxx-4.dll_**, **_libmpfr-4.dll_**, **_flint.dll_**, **_arb.dll_**).
+**_/local/bin_** contains shared libraries (**_libgmp-10.dll_**, **_libgmpxx-4.dll_**, **_libmpfr-4.dll_**, **_flint.dll_**, **_arb.dll_**). They are also included in **DLLs** folder of this repository.
 
-**_/local/lib_** contains static libraries for compiler and target defined in **_build_ARB.sh_**. I decided not to include them in **_ARB_MinGW_package.7z_** as everybody needs to build them using their own compiler and target anyway.
+**_/local/lib_** contains static libraries for compiler and target defined in **_build_ARB.sh_**. I decided not to include them in **_ARB_for_MinGW.7z_** as everybody needs to build them using their own compiler and target anyway.
 
-**_/local/include_** contains header files needed to build against the static libraries, also not included in **_ARB_MinGW_package.7z_**.
+**_/local/include_** contains header files needed to build against the static libraries, also not included in **_ARB_for_MinGW.7z_**.
 
 **_/local/shared_** contains some documentation automatically generated during the build process.
 
-Shared libraries are included in **DLLs** folder of this repository.
-
 ## Workflow
 
-1. **_ARB_MinGW_package.7z_** contains all sufficient material to build described static and dynamic libraries. Download and unpack it into any desired folder.
+1. **_ARB_for_MinGW.7z_** contains all sufficient material to build described static and dynamic libraries. Download and unpack it into any desired folder.
 2. Check and adapt `COMPILER`, `HOST` & `BUILD` variables at ln. 27-29 of **_/local/bin/build_ARB.sh_** according to your setting and preferences. Also, every library can be set to be build in static or shared form and checked by the available set of tests. One can control this by setting corresponding `ERASE`, `BUILD`, `CHECK` & `CLEAN` variables to "yes"/"no" value at ln. 34-56 of **_build_ARB.sh_**.
-3. Finally, after starting MSYS2 shell, one simply has to execute the following command and the build process will start:
+3. Finally, after starting MSYS2 shell (**mingw32_shell.bat**), one simply has to execute the following command and the build process will start:
 ```
-$ build_ARB.sh
+$ /local/bin/build_ARB.sh
 ```
-**_build_ARB.sh_** automatically executes the entire workflow with timing & log files written to **_/usr/tmp_** folder. You can check on the process viewing them as they are appended.
+**_build_ARB.sh_** automatically executes the entire workflow with timing & log files written to **_/var/log_** folder. You can check on the process viewing them as they are appended.
 
-Applications built using **_arb_** and **_flint_** static libraries expect to find **_libgmp-10.dll_** and **_libmpfr-4.dll_** in system **_PATH_**.
+Applications built using **_arb_** and **_flint_** static libraries expect to find **_libgmp-10.dll_** and **_libmpfr-4.dll_** in local folder or system **_PATH_**.
 ## Demo
 
 In this demo we evaluate one simple pandigital approximation of natural constant **e** correct to 46 decimal places. ARB also calculates accumulated numerical error so every result is printed as _ball_ containing the result with absolute certainty. Internal computational precision is set to `p=1000`, way more than needed.
