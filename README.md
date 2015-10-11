@@ -58,22 +58,34 @@ File **_arb-master/arb/test/t-set_str.c_** was patched to avoid MinGW problem wi
 
 Make sure you take this facts into consideration if you use `atof` or deserialize "inf"/"nan" strings under MinGW. This cases have to be handled in a special manner.
 ```
-arb-master/arb/test/t-set_str.c
-ln. 115-127
+--- /d/repos/github/arb4win32/msys64/local/src/arb-master/arb/test/t-set_str.c 2                         015-10-11 20:22:41.599262200 +0200
++++ /d/repos/github/arb/arb/test/t-set_str.c    2015-10-11 20:03:03.894901400 +0                         200
+@@ -184,7 +184,7 @@
 
-    /* PATCH!: this block is commented out to avoid MinGW problem with atof("inf")=0.0 atof("nan")=0.0 */
-    /*
-    "inf",
-    "-inf",
-    "+inf",
-    "Inf",
-    "-INF",
-    "+Inf",
+         error = arb_set_str(t, testdata_floats[i], 53);
 
-    "NAN",
-    "-NaN",
-    "+NAN",
-    */
+-        x = atof(testdata_floats[i]);
++        x = strtod(testdata_floats[i], NULL);
+
+         if (x != x)
+         {
+@@ -230,7 +230,7 @@
+
+                 error = arb_set_str(t, tmp, 53);
+
+-                x = atof((i == 0) ? "0" : testdata_floats[i]);
++                x = strtod((i == 0) ? "0" : testdata_floats[i], NULL);
+
+                 if (x != x)
+                 {
+@@ -242,7 +242,7 @@
+                     mag_zero(arb_radref(u));
+                 }
+
+-                x = atof(testdata_floats[j]);
++                x = strtod(testdata_floats[j], NULL);
+                 arf_set_d(arb_midref(v), x);
+                 mag_zero(arb_radref(v));
 ```
 ## Workflow
 
