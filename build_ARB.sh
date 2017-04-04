@@ -1,58 +1,55 @@
-#! /bin/bash
+#!/usr/bin/env bash
 #
 #  author: Hrvoje Abraham
-#              date: 09.10.2015
-#              desc: Bash script for building static and dynamic GMP, MPFR, FLINT & ARB Win32 libs under MSYS2
-#    prev. versions: 05.04.2015.
+#              date: 03.04.2017
+#              desc: Bash script for building static and shared GMP, MPFR, FLINT & ARB Win32 libs
+#
+#    prev. versions: 09.10.2015
+#                    05.04.2015
 #
 #  Configuration used at the moment of writing this script:
-#    Windows 7 64-bit
-#    MSYS2, maximally reduced, including:
-#      - bash v4.3.42(2)
-#      - grep v2.21
-#      - make v4.1
-#      - diffutils v3.3-3 (diff, cmp)
-#    Compiler info:
-#      - gcc version v4.9.2 (i686-posix-dwarf-rev1, Built by MinGW-W64 project)
-#    GMP v6.0.0a
-#      - patch: tests/cxx/clocale.c for redeclaration of localeconv
-#    MPFR v3.1.3
-#    FLINT v2.5.2
-#    ARB v2.7.0+
-#      - master branch head from 07.10.2015 (github commit aaa4d86)
-#      - patch: arb/test/t-set_str.c for MinGW issue with atof("inf")=0.0 atof("nan")=0.0
-#
+#    Windows 10 64-bit
+#    MSYS2 64-bit 20161025
+#      - update MSYS2: pacman -Syu
+#      - install make: pacman -S make
+#      - install diff: pacman -S diffutils
 
-# modify according to your setup and preferences
-COMPILER=c:/Qt/Qt5.5.0/Tools/mingw492_32 # windows style path!
+# modify if needed
+COMPILER=c:/Qt/Qt5.8.0/Tools/mingw530_32 # windows style path!
 HOST="i686-w64-mingw32"
 BUILD="i686-w64-mingw32"
 
 SOURCE=/local/src # posix style path
 TARGET=/local # posix style path
 
+# modify if needed
 ERASE_OLD_BUILDS="yes"
 
-GMP="$SOURCE"/gmp-6.0.0
+# modify if needed
+GMP="$SOURCE"/gmp-6.1.2
 BUILD_GMP="yes"
 CHECK_GMP="no"
 CLEAN_GMP="no"
 
-MPFR="$SOURCE"/mpfr-3.1.3
+# modify if needed
+MPFR="$SOURCE"/mpfr-3.1.5
 BUILD_MPFR="yes"
 CHECK_MPFR="no"
 CLEAN_MPFR="no"
 
+# modify if needed
 FLINT="$SOURCE"/flint-2.5.2
 BUILD_FLINT="yes"
 CHECK_FLINT="no"
 CLEAN_FLINT="no"
 
+# modify if needed
 ARB="$SOURCE"/arb-master
 BUILD_ARB="yes"
 CHECK_ARB="yes"
 CLEAN_ARB="no"
 
+# modify if needed
 CLEAN_ALL="yes"
 
 # ABI=32 instead of ABI=64 because ARB is still not Windows 64-bit safe (uses slong instead long, etc.)
@@ -203,7 +200,7 @@ ARB_PARAMS="--build="$BUILD" --prefix="$TARGET" --with-gmp="$TARGET" --with-mpfr
 [[ "$BUILD_FLINT" == "yes" ]] && build "FLINT" "static" "$FLINT_PARAMS"
 [[ "$BUILD_ARB" == "yes" ]]   && build "ARB" "static" "$ARB_PARAMS"
 
-# build & check shared libs
+# build & check shared libs (DLLs)
 [[ "$BUILD_GMP" == "yes" ]]   && build "GMP" "shared" "$GMP_PARAMS"
 [[ "$BUILD_MPFR" == "yes" ]]  && build "MPFR" "shared" "$MPFR_PARAMS"
 [[ "$BUILD_FLINT" == "yes" ]] && build "FLINT" "shared" "$FLINT_PARAMS"
