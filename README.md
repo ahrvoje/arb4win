@@ -98,7 +98,7 @@ int main()
 	arb_clear(t);
 }
 ```
-Demo is compiled by the following command line. **gcc** has to be available in **PATH**. Notice `-m32` switch, although this demo works without it as well.
+Demo is compiled by the following command line. **gcc** has to be available in **_PATH_**. Notice `-m32` switch, although this demo works without it as well.
 ```
 $ g++ -m32 -I/local/include -I/local/include/flint -I/local/include/flintxx arb_demo.cpp -L/local/lib -larb -lflint -lmpfr -lgmp
 ```
