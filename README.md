@@ -4,7 +4,7 @@
 
 GMP, MPFR, FLINT and ARB are well known numerical libraries for large integer and arbitrary precision floating point arithmetic. A special emphasis is given to _ball arithmetic_ library [ARB](https://github.com/fredrik-johansson/arb/) by Frederik Johansson.
 
-This repository does not contribute to their functionalities, but is a mere guide and resource container for porting to Windows.
+This repository does not contribute to their functionalities, but is a guide for building 32-bit versions for Windows.
 
 ## System and environment
 
@@ -42,12 +42,13 @@ Applications built using **_arb_** and **_flint_** static libraries expect to fi
 
 Once built, the following folders contain the files needed to use the libraries.
 
-**_/local/bin_** contains shared libraries (**_libgmp-10.dll_**, **_libgmpxx-4.dll_**, **_libmpfr-4.dll_**, **_flint.dll_**, **_arb.dll_**). They are also included in **DLLs** folder of this repository.
+**_/local/bin_** contains shared libraries (**_libgmp-10.dll_**, **_libgmpxx-4.dll_**, **_libmpfr-4.dll_**, **_flint.dll_**, **_arb.dll_**). They are also included in the **DLLs** folder.
 
-**_/local/include_** contains header files needed to build against the static libraries, not included in **_ARB_for_MinGW.7z_**.
+**_/local/include_** contains header files needed to build against the static libraries.
 
-**_/local/lib_** contains static libraries for compiler and target defined in **_build_ARB.sh_**. I decided not to include them in 
+**_/local/lib_** contains static libraries for compiler and target defined in **_build_ARB.sh_**.
 **_/local/shared_** contains some documentation automatically generated during build process.
+
 ## Demo
 
 In this demo we evaluate one simple _pandigital approximation_ of natural constant **e** correct to 46 decimal places. ARB also calculates accumulated numerical error so every result is printed as _ball_ containing the result with absolute certainty. Internal computational precision is set to `p=1000`, way more than needed.
