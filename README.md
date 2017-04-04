@@ -13,7 +13,7 @@ This repository does not contribute to their functionalities, but is a guide for
    - GMP v6.1.2 ([ftp://ftp.gnu.org/gnu/gmp/](ftp://ftp.gnu.org/gnu/gmp/))
    - MPFR v3.1.5 ([http://www.mpfr.org/mpfr-current/](http://www.mpfr.org/mpfr-current/))
    - FLINT v2.5.2 ([http://flintlib.org/downloads.html](http://flintlib.org/downloads.html))
-   - ARB v2.10.0+ (commit 99c1696b48de74959ccb6bd88187e8b15262ff4d) ([https://github.com/fredrik-johansson/arb/](https://github.com/fredrik-johansson/arb/))
+   - ARB v2.10.0+ (commit fredrik-johansson/arb@99c1696b48de74959ccb6bd88187e8b15262ff4d) ([https://github.com/fredrik-johansson/arb/](https://github.com/fredrik-johansson/arb/))
 - **_build_ARB.sh_** in **_/local/bin_**
 - Windows 10 64-bit
 - gcc compiler:
