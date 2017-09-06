@@ -4,7 +4,7 @@
 
 GMP, MPFR, FLINT and ARB are well known numerical libraries for large integer and arbitrary precision floating point arithmetic. A special emphasis is given to _ball arithmetic_ library [ARB](https://github.com/fredrik-johansson/arb/) by Frederik Johansson.
 
-This repository does not contribute to their functionalities, but is a guide for building 32-bit versions for Windows.
+This repository does not contribute to the functionality, but is a guide for building 32-bit libs for Windows.
 
 ## System and environment
 
@@ -13,7 +13,7 @@ This repository does not contribute to their functionalities, but is a guide for
    - GMP v6.1.2 ([ftp://ftp.gnu.org/gnu/gmp/](ftp://ftp.gnu.org/gnu/gmp/))
    - MPFR v3.1.5 ([http://www.mpfr.org/mpfr-current/](http://www.mpfr.org/mpfr-current/))
    - FLINT v2.5.2 ([http://flintlib.org/downloads.html](http://flintlib.org/downloads.html))
-   - ARB v2.10.0+ (commit 99c169) ([https://github.com/fredrik-johansson/arb/](https://github.com/fredrik-johansson/arb/))
+   - ARB v2.11.1+ (commit fcd3d3b) ([https://github.com/fredrik-johansson/arb/](https://github.com/fredrik-johansson/arb/))
 - **_build_ARB.sh_** in **_/local/bin_**
 - Windows 10 64-bit
 - gcc compiler:
