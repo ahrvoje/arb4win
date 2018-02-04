@@ -4,27 +4,26 @@
 
 GMP, MPFR, FLINT and ARB are well known numerical libraries for large integer and arbitrary precision floating point arithmetic. A special emphasis is given to _ball arithmetic_ library [ARB](https://github.com/fredrik-johansson/arb/) by Frederik Johansson.
 
-This repository does not contribute to the functionality, but is a guide for building 32-bit libs for Windows.
+The repository doesn't contribute to the functionality, but is a guide for building 32-bit libs for Windows.
 
 ## System and environment
 
-- MSYS2 incldcing **make** and **diffutils**
-- sources with patched tests in **_/local/src_** folder:
+- MSYS2 including **make** and **diffutils**
+- versions used for current builds:
    - GMP v6.1.2 ([ftp://ftp.gnu.org/gnu/gmp/](ftp://ftp.gnu.org/gnu/gmp/))
    - MPFR v3.1.5 ([http://www.mpfr.org/mpfr-current/](http://www.mpfr.org/mpfr-current/))
    - FLINT v2.5.2 ([http://flintlib.org/downloads.html](http://flintlib.org/downloads.html))
    - ARB v2.11.1+ (commit fcd3d3b) ([https://github.com/fredrik-johansson/arb/](https://github.com/fredrik-johansson/arb/))
 - **_build_ARB.sh_** in **_/local/bin_**
 - Windows 10 64-bit
-- gcc compiler:
-   - Qt 5.8.0
-   - gcc version 5.3.0 (i686-posix-dwarf-rev0, Built by MinGW-W64 project) 
+- gcc compiler (via Qt 5.8.0):
+   - gcc version 5.3.0 (i686-posix-dwarf-rev0, Built by MinGW-W64 project)
    - Target: i686-w64-mingw32
    - Thread model: posix
 
-Cygwin is not used as it does not handle symbolic links used by some **configure** and **make** scripts in a desirable way. MSYS2 solves this issue by implementing customized **ln** command which simply creates hard copies.
+Cygwin isn't used as it does not handle symbolic links used by some **configure** and **make** scripts in a desirable way. MSYS2 solves this issue by implementing customized **ln** command which simply creates hard-copies.
 
-The libraries are not 64-bit Windows safe so the entire workflow is adapted to 32-bit building process (configuration parameter `ABI=32` is set for all of them). Consequently, if one builds against the static libraries, `-m32` gcc/g++ switch sometimes has to be used to compile target application, as shown in Demo section at the end of this page.
+The libraries are not 64-bit Windows safe so the entire workflow is adapted to 32-bit building process (configuration parameter `ABI=32` is set for all of them). Consequently, if one builds against the static libraries, `-m32` gcc/g++ switch sometimes has to be used to compile target application, as shown in Demo section at the end of the page.
 
 ## Workflow
 
