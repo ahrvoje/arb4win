@@ -1,106 +1,89 @@
 #!/usr/bin/env bash
 #
-#  author: Hrvoje Abraham
-#              date: 03.04.2017
-#              desc: Bash script for building static and shared GMP, MPFR, FLINT & ARB Win32 libs
+#  author   : Hrvoje Abraham
+#  date     : 05.04.2015
+#  desc     : Bash script for building static and shared GMP, MPFR, FLINT & ARB Win32 libs
 #
-#    prev. versions: 09.10.2015
-#                    05.04.2015
+#  revisions: 09.10.2015
+#             03.04.2017
+#             10.02.2020 - use MSYS2 mingw, not Qt
 #
-#  Configuration used at the moment of writing this script:
+#  Configuration used at the latest revision:
 #    Windows 10 64-bit
-#    MSYS2 64-bit 20161025
-#      - update MSYS2: pacman -Syu
-#      - install make: pacman -S make
-#      - install diff: pacman -S diffutils
+#    msys2-i686-20190524
+#      - update MSYS2 : pacman -Syu
+#      - update MSYS2 : pacman -Su
+#      - install make : pacman -S make
+#      - install diff : pacman -S diffutils
+#      - install mingw: pacman -S mingw-w64-i686-gcc
+
+SOURCE=/var/local/src # posix style path
+TARGET=/var/local # posix style path
 
 # modify if needed
-COMPILER=c:/Qt/Qt5.8.0/Tools/mingw530_32 # windows style path!
-HOST="i686-w64-mingw32"
-BUILD="i686-w64-mingw32"
-
-SOURCE=/local/src # posix style path
-TARGET=/local # posix style path
+ERASE_OLD_BUILDS="no"
 
 # modify if needed
-ERASE_OLD_BUILDS="yes"
-
-# modify if needed
-GMP="$SOURCE"/gmp-6.1.2
-BUILD_GMP="yes"
+GMP="$SOURCE"/gmp-6.2.0
+BUILD_GMP="no"
 CHECK_GMP="no"
 CLEAN_GMP="no"
 
 # modify if needed
-MPFR="$SOURCE"/mpfr-3.1.5
-BUILD_MPFR="yes"
+MPFR="$SOURCE"/mpfr-4.0.2
+BUILD_MPFR="no"
 CHECK_MPFR="no"
 CLEAN_MPFR="no"
 
 # modify if needed
 FLINT="$SOURCE"/flint-2.5.2
-BUILD_FLINT="yes"
+BUILD_FLINT="no"
 CHECK_FLINT="no"
 CLEAN_FLINT="no"
 
 # modify if needed
-ARB="$SOURCE"/arb-master
-BUILD_ARB="yes"
+ARB="$SOURCE"/arb-2.17.0
+BUILD_ARB="no"
 CHECK_ARB="yes"
 CLEAN_ARB="no"
 
 # modify if needed
-CLEAN_ALL="yes"
+CLEAN_ALL="no"
 
 # ABI=32 instead of ABI=64 because ARB is still not Windows 64-bit safe (uses slong instead long, etc.)
 ABI=32
 
-# initial $PATH
-PATH=.:/usr/bin
-
-# convert windows style path to posix
-function posix_path {
-	echo "/$1" | sed -e 's/\\/\//g' -e 's/://'
-}
-
 # maximally reduced PATH
-PATH=$PATH:"$(posix_path $COMPILER)"/bin:"$TARGET"/bin:"$TARGET"/lib
+PATH=.:/usr/bin:/mingw32/bin:"$TARGET"/bin:"$TARGET"/lib
 
 # standardized timestamp
 function timestamp {
-    date --rfc-3339=seconds
-}
-
-function ismounted {
-	DIR="$1"
-	TMP="$(mount | grep "$DIR")"
-    if [ -n "$TMP" ]; then
-        echo "yes"
-    else
-        echo "no"
-    fi
+  date --rfc-3339=seconds
 }
 
 # prints empty line in LOGFILE, for better readability
 function LOGLINE {
-    echo >> "$LOGFILE"
+  echo >> "$LOGFILE"
 }
 
 # adds RFC 3339 compliant timestamp to the message and prints to LOG and TIME file
 function LOG {
-    STAMPED="$(timestamp) $1"
-    echo -e "$STAMPED" >> "$LOGFILE"
-    echo -e "$STAMPED" >> "$TIMEFILE"
+  STAMPED="$(timestamp) $1"
+  echo -e "$STAMPED" >> "$LOGFILE"
+  echo -e "$STAMPED" >> "$TIMEFILE"
 }
 
 # logs compiler info
 function LOGcompilerinfo {
 	GCC_INFO="/tmp/gcc.info"
+
 	gcc -v > $GCC_INFO 2>&1
-    LOG "Compiler info:"
+
+  LOG "Compiler info:"
 	LOG "    $(cat $GCC_INFO | grep "gcc version")"
 	LOG "    $(cat $GCC_INFO | grep "Target")"
 	LOG "    $(cat $GCC_INFO | grep "Thread")"
+
 	[[ -f "$GCC_INFO" ]] && rm "$GCC_INFO"
 }
 
@@ -113,9 +96,9 @@ function exe {
 # clean build folder
 function clean {
 	LOG "cleaning $1"
-    exe "cd "$1""
-    exe "make clean"
-    exe "make distclean"
+  exe "cd "$1""
+  exe "make clean"
+  exe "make distclean"
 }
 
 # build logistics for static & shared libs (clean, configure, make, make check, make install)
@@ -130,20 +113,20 @@ function build {
 	echo "$(timestamp)   configuring..."
 	LOG "$(timestamp) CONFIGURING $2 $1"
 	if [ "$2" == "static" ]
-	    then
-	        exe "./configure $3 --disable-shared --enable-static"
-		else
-	        exe "./configure $3 --enable-shared --disable-static"
+	  then
+      exe "./configure $3 --disable-shared --enable-static"
+    else
+      exe "./configure $3 --enable-shared --disable-static"
 	fi
 
 	echo "$(timestamp)   making..."
 	LOG "$(timestamp) MAKING $2 $1"
 	exe "make"
 
-    # check only shared libs
+  # check only shared libs
 	if [ "$2" == "shared" ]; then
-	    TO_CHECK="CHECK_$1"
-	    [ "${!TO_CHECK}" == "yes" ] && (echo "$(timestamp)   checking..."; 	LOG "$(timestamp) CHECKING $2 $1"; exe "make check")
+    TO_CHECK="CHECK_$1"
+    [ "${!TO_CHECK}" == "yes" ] && (echo "$(timestamp)   checking..."; 	LOG "$(timestamp) CHECKING $2 $1"; exe "make check")
 	fi
 
 	echo "$(timestamp)   installing..."
@@ -160,33 +143,19 @@ TIMEFILE="/var/log/build_ARB_time.log"
 
 # erase old builds
 if [ "$ERASE_OLD_BUILDS" == "yes" ]; then
-    echo "$(timestamp) erasing old builds... "
+  echo "$(timestamp) erasing old builds... "
 
-    # shared libs
-    if ls "$TARGET/bin/*.dll" 1> /dev/null 2>&1; then
-	    cd "$TARGET/bin"
-		rm *.dll
-	fi
+  # shared libs
+  if ls "$TARGET/bin/*.dll" 1> /dev/null 2>&1; then
+    cd "$TARGET/bin"
+    rm *.dll
+  fi
 
-    # includes, static libs, shares
+  # includes, static libs, shares
 	[[ -d "$TARGET/include" ]] && rm -r "$TARGET/include"
 	[[ -d "$TARGET/lib" ]]     && rm -r "$TARGET/lib"
 	[[ -d "$TARGET/share" ]]   && rm -r "$TARGET/share"
 fi
-
-# /mingw mount point to MinGW installed in COMPILER folder
-if [ "$(ismounted /mingw)" == "yes" ]; then
-    echo "$(timestamp) umount /mingw"
-    exe "umount /mingw"
-fi
-echo "$(timestamp) mounting $COMPILER to /mingw"
-exe "mount -f "$COMPILER" /mingw"
-
-# print environment info, just for case
-LOG "PATH: $PATH"
-LOG "mingw mount: $(df -h /mingw | grep mingw  | awk '{print $1}')"
-LOGcompilerinfo
-LOGLINE
 
 # configure parameters
 GMP_PARAMS="--build="$BUILD" --host="$HOST" --prefix="$TARGET" --enable-cxx ABI="$ABI""
@@ -207,8 +176,8 @@ ARB_PARAMS="--build="$BUILD" --prefix="$TARGET" --with-gmp="$TARGET" --with-mpfr
 [[ "$BUILD_ARB" == "yes" ]]   && build "ARB" "shared" "$ARB_PARAMS"
 
 # copy FLINT and ARB shared libraries to bin folder
-[[ -f "$TARGET/lib/libflint.so" ]] && exe "cp $TARGET/lib/libflint.so $TARGET/bin/flint.dll"
-[[ -f "$TARGET/lib/libarb.so" ]]   && exe "cp $TARGET/lib/libarb.so $TARGET/bin/arb.dll"
+[[ -f "$TARGET/lib/libflint.dll" ]] && exe "cp $TARGET/lib/libflint.dll $TARGET/bin/flint.dll"
+[[ -f "$TARGET/lib/libarb.dll" ]]   && exe "cp $TARGET/lib/libarb.dll $TARGET/bin/arb.dll"
 
 # clean builds
 [[ ("$CLEAN_ALL" == "yes") || ("$CLEAN_GMP" == "yes") ]]   && exe "clean "$GMP""

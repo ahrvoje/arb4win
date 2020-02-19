@@ -1,5 +1,6 @@
 #include "arb.h"
 
+
 int main()
 {
 	long p = 1000;
@@ -33,10 +34,12 @@ int main()
 	arb_sub(t, x, t, p);
 	printf("x-e = "); arb_printd(t, d); printf("\n");
 
-	printf("Computed with arb-%s\n", arb_version);
+	printf("Computed with Arb %s\n", arb_version);
 
 	arb_clear(a);
 	arb_clear(b);
 	arb_clear(x);
 	arb_clear(t);
+
+	return 0;
 }
