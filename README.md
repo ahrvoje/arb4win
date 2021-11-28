@@ -193,8 +193,6 @@ int main()
 	arb_sub_d(t, x, t, p);
 	printf("x-e = "); arb_printd_d(t, d); printf("\n");
 
-	printf("Computed with Arb %s\n", arb_version_d);
-
 	arb_clear_d(a);
 	arb_clear_d(b);
 	arb_clear_d(x);
