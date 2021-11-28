@@ -40,12 +40,12 @@ Applications built using **_arb_** and **_flint_** static libraries expect to fi
 
 Once built, the following folders contain the files needed to use the libraries.
 
-**_/usr/var/bin_** contains shared libraries (**_libgmp-10.dll_**, **_libgmpxx-4.dll_**, **_libmpfr-6.dll_**, **_flint.dll_**, **_arb.dll_**). They are also included in the **DLL** folder.
+**_/opt/bin_** contains shared libraries (**_libgmp-10.dll_**, **_libgmpxx-4.dll_**, **_libmpfr-6.dll_**, **_flint.dll_**, **_arb.dll_**). They are also included in the **DLL** folder.
 
-**_/usr/var/include_** contains header files needed to build against the libraries.
+**_/opt/include_** contains header files needed to build against the libraries.
 
-**_/usr/var/lib_** contains static libraries for compiler and target defined in **_build_ARB.sh_**.
-**_/usr/var/shared_** contains some documentation automatically generated during build process.
+**_/opt/lib_** contains static libraries for compiler and target defined in **_build_ARB.sh_**.
+**_/opt/shared_** contains some documentation automatically generated during build process.
 
 ## Demo
 
