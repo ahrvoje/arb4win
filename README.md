@@ -22,7 +22,7 @@ The repository doesn't contribute to the functionality, but is a guide for build
 
 Cygwin isn't used as it does not handle symbolic links used by some **configure** and **make** scripts in a desirable way. MSYS2 solves this issue by implementing customized **ln** command which simply creates hard-copies.
 
-The libraries are not 64-bit Windows safe so the entire workflow is adapted to 32-bit building process (configuration parameter `ABI=32` is set for all of them). Consequently, if one builds against the static libraries, `-m32` gcc/g++ switch sometimes has to be used to compile target application, as shown in Demo section at the end of the page.
+The libraries are not 64-bit Windows safe so the entire workflow is adapted to 32-bit building process (configuration parameter `ABI=32` is set for all of them). Consequently, if one builds against the static libraries, `-m32` gcc/g++ compiler switch sometimes has to be used.
 
 ## Workflow
 
