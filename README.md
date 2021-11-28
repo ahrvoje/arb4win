@@ -27,12 +27,13 @@ The libraries are not 64-bit Windows safe so the entire workflow is adapted to 3
 ## Workflow
 
 1. Install MSYS2, update and install **m4**, **make**, **difftools** and **mingw-w64-i686-gcc**
-2. Check and adapt `SOURCE` & `TARGET` variables in **_/local/bin/build_ARB.sh_** to set the desired source and target folders. Also, every library can be set to be build in static or shared form and checked by available set of tests. One can control this by setting corresponding `ERASE`, `BUILD`, `CHECK` & `CLEAN` variables to "yes"/"no" value.
-3. Finally, after starting MSYS2 shell (**mingw32_shell.bat**), execute the following command and the build process will start:
+2. Extract GMP, MPFR, FLINT & ARB src into **_/opt/src_** folder.
+3. Check and adapt `SOURCE` & `TARGET` variables in **_build_ARB.sh_** to set the desired source and target folders, e.g. `SOURCE=/opt/src` and `TARGET=/opt`. Also, every library can be set to be build in static or shared form and checked by available set of tests. One can control this by setting corresponding `ERASE`, `BUILD`, `CHECK` & `CLEAN` variables to "yes"/"no" value.
+4. Finally, after starting MSYS2 mingw32 shell (**mingw32.exe**), execute the following command and the build process will start:
 ```
-$ /local/bin/build_ARB.sh
+$ build_ARB.sh
 ```
-**_build_ARB.sh_** automatically executes the entire workflow with timing & log files written to **_/usr/var/log_** folder.
+**_build_ARB.sh_** automatically executes the entire workflow with timing & log files written to **_/var/log_** folder.
 
 Applications built using **_arb_** and **_flint_** static libraries expect to find **_libmpfr-6.dll_** in local folder or system **_PATH_**.
 
