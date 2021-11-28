@@ -136,7 +136,7 @@ int main()
 	}
 
 	char* arb_version_d = *( (char**) GetProcAddress(hArb, "arb_version"));
-	printf("Computed with Arb %ld\n", arb_version_d);
+	printf("Computed with Arb %s\n", arb_version_d);
 
 	typedef void(__cdecl *arb_add_t)      (arb_t, arb_t, arb_t, long);
 	typedef void(__cdecl *arb_clear_t)    (arb_t);
