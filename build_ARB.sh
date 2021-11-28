@@ -9,41 +9,40 @@
 #             10.02.2020 - use MSYS2 mingw, not Qt
 #
 #  Configuration used at the latest revision:
-#    Windows 10 64-bit
-#    msys2-i686-20190524
+#    Windows 11 64-bit
+#    msys2-x86_64-20210725
 #      - update MSYS2 : pacman -Syu
 #      - update MSYS2 : pacman -Su
-#      - install make : pacman -S make
-#      - install diff : pacman -S diffutils
+#      - install devel: pacman -S base-devel
 #      - install mingw: pacman -S mingw-w64-i686-gcc
 
-SOURCE=/var/local/src # posix style path
-TARGET=/var/local # posix style path
+SOURCE=/opt/src # posix style path
+TARGET=/opt     # posix style path
 
 # modify if needed
-ERASE_OLD_BUILDS="no"
+ERASE_OLD_BUILDS="yes"
 
 # modify if needed
-GMP="$SOURCE"/gmp-6.2.0
-BUILD_GMP="no"
-CHECK_GMP="no"
+GMP="$SOURCE"/gmp-6.2.1
+BUILD_GMP="yes"
+CHECK_GMP="yes"
 CLEAN_GMP="no"
 
 # modify if needed
-MPFR="$SOURCE"/mpfr-4.0.2
-BUILD_MPFR="no"
-CHECK_MPFR="no"
+MPFR="$SOURCE"/mpfr-4.1.0
+BUILD_MPFR="yes"
+CHECK_MPFR="yes"
 CLEAN_MPFR="no"
 
 # modify if needed
-FLINT="$SOURCE"/flint-2.5.2
-BUILD_FLINT="no"
-CHECK_FLINT="no"
+FLINT="$SOURCE"/flint-2.8.4
+BUILD_FLINT="yes"
+CHECK_FLINT="yes"
 CLEAN_FLINT="no"
 
 # modify if needed
-ARB="$SOURCE"/arb-2.17.0
-BUILD_ARB="no"
+ARB="$SOURCE"/arb-2.21.1
+BUILD_ARB="yes"
 CHECK_ARB="yes"
 CLEAN_ARB="no"
 

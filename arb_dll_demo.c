@@ -7,7 +7,16 @@ int main()
 {
 	HINSTANCE hArb = LoadLibrary(TEXT("arb.dll"));
 
+	if (! hArb) {
+		printf("Error loading arb.dll\n");
+		printf("Error code: %ld\n", GetLastError());
+		printf("https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes\n");
+
+        return EXIT_FAILURE;
+	}
+    
 	char* arb_version_d = *( (char**) GetProcAddress(hArb, "arb_version"));
+	printf("Computed with Arb %s\n", arb_version_d);
 
 	typedef void(__cdecl *arb_add_t)      (arb_t, arb_t, arb_t, long);
 	typedef void(__cdecl *arb_clear_t)    (arb_t);
@@ -60,8 +69,6 @@ int main()
 	arb_sub_d(t, x, t, p);
 	printf("x-e = "); arb_printd_d(t, d); printf("\n");
 
-	printf("Computed with Arb %s\n", arb_version_d);
-
 	arb_clear_d(a);
 	arb_clear_d(b);
 	arb_clear_d(x);
@@ -69,5 +76,5 @@ int main()
 
 	FreeLibrary(hArb);
 
-	return 0;
+    return EXIT_SUCCESS;
 }
