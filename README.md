@@ -117,8 +117,6 @@ x-e = 3.9678376581476207465438603498757884997818078351607135e-47 +/- 1.514e-300
 
 ### Dynamic version for Windows
 
-Expects **_libmpfr-6.dll_** and **_arb.dll_** DLLs available in local folder or **_PATH_**.
-
 ```
 #include <windows.h>
 
@@ -201,11 +199,10 @@ int main()
 	return 0;
 }
 ```
-
 ```
 $ gcc -I/var/local/include arb_dll_demo.c
 ```
-
+The application expects **_libmpfr-6.dll_** and **_arb.dll_** DLLs available in local folder or **_PATH_**.
 ```
 $ ./a.exe
 Computed with Arb 2.21.1
