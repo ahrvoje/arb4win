@@ -1,0 +1,1 @@
+gcc -Ibuild/i686/include arb_demo.c -obuild/i686/bin/static_demo.exe -Lbuild/i686/lib -larb -lflint -lmpfr -lgmp

@@ -1,0 +1,1 @@
+gcc -Ibuild/x86_64/include arb_dll_demo.c -obuild/x86_64/bin/shared_demo.exe

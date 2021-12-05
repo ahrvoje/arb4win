@@ -1,1 +1,0 @@
-gcc -I/opt/include /c/repos/arb4win32/arb_dll_demo.c
