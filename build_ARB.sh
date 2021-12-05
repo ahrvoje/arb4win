@@ -19,11 +19,13 @@
 #      - install mingw64: pacman -S mingw-w64-x86_64-gcc
 #      - install yasm   : pacman -S yasm
 
+[ $(uname -o) != Msys ] && { echo "MSYS environment required. Exiting..."; exit 1; }
+
 # modify if needed
 SOURCE=/opt/src
 
 # modify if needed
-DELETE_OLD_BUILDS="yes"
+DELETE_OLD_BUILDS="no"
 
 # modify if needed
 GMP=$SOURCE/gmp-6.2.1
@@ -34,19 +36,19 @@ CLEAN_GMP="no"
 # modify if needed
 MPIR=$SOURCE/mpir-3.0.0
 BUILD_MPIR="yes"
-CHECK_MPIR="no"
+CHECK_MPIR="yes"
 CLEAN_MPIR="no"
 
 # modify if needed
 MPFR=$SOURCE/mpfr-4.1.0
 BUILD_MPFR="yes"
-CHECK_MPFR="no"
+CHECK_MPFR="yes"
 CLEAN_MPFR="no"
 
 # modify if needed
 FLINT=$SOURCE/flint-2.8.4
 BUILD_FLINT="yes"
-CHECK_FLINT="no"
+CHECK_FLINT="yes"
 CLEAN_FLINT="no"
 
 # modify if needed
@@ -99,17 +101,20 @@ function build {
     [ $2 == "shared"        ] && STATIC_SHARED="--disable-static --enable-shared"
     [ $2 == "static&shared" ] && STATIC_SHARED="--enable-static --enable-shared"
 
-    PARAMS_S=$1"_PARAMS"
-    PARAMS=${!PARAMS_S}
-    exe "./configure ABI="$ABI" --prefix="$TARGET" $PARAMS $STATIC_SHARED"
-    [ $? -ne 0 ] && { LOG "Configuration error occured. Stopping build process..."; exit 1; }
+    PARAMS=$1"_PARAMS"
+    exe "./configure ABI="$ABI" --prefix="$TARGET" ${!PARAMS} $STATIC_SHARED"
+    [ $? != 0 ] && { LOG "Configuration error occured. Stopping build process..."; exit 1; }
     
     LOG "MAKING "$2" "$1
     exe "make"
-    [ $? -ne 0 ] && { LOG "Make error occured. Stopping build process..."; exit 1; }
+    [ $? != 0 ] && { LOG "Make error occured. Stopping build process..."; exit 1; }
 
     TO_CHECK="CHECK_"$1
-    [ ${!TO_CHECK} == "yes" ] && [[ $2 == *"shared"* ]] && { LOG "CHECKING "$2" "$1; exe "make check"; }
+    [ ${!TO_CHECK} == "yes" ] && [[ $2 == *"static"* ]] && {  # only static FLINT and ARB can be checked
+        LOG "CHECKING "$2" "$1;
+        exe "make check";
+        [ $? != 0 ] && { LOG "Check FAILED!"; }
+    }
 
     LOG "INSTALLING "$2" "$1
     exe "make install"
@@ -122,9 +127,8 @@ LOGFILE=/var/log/build_ARB.log
 TIMEFILE=/var/log/build_ARB_time.log
 [ -f $TIMEFILE ] && rm $TIMEFILE
 
-ARCH=$(gcc -v 2>&1 | grep "Target")
-[[ $ARCH == *" i686"*   ]] && { ABI=32; TARGET=/opt/i686; }
-[[ $ARCH == *" x86_64"* ]] && { ABI=64; TARGET=/opt/x86_64; }
+[[ $(uname) == MINGW32* ]] && { ABI=32; TARGET=/opt/i686; }
+[[ $(uname) == MINGW64* ]] && { ABI=64; TARGET=/opt/x86_64; }
 
 # expand PATH to make new libs available for tests
 PATH=$PATH:$TARGET/lib:$TARGET/bin
@@ -152,13 +156,13 @@ ARB_PARAMS="--with-mpir="$TARGET" --with-mpfr="$TARGET" --with-flint="$TARGET" C
 # build libs
 [ $BUILD_GMP   == "yes" ] && { build "GMP" "static"; build "GMP" "shared"; }
 [ $BUILD_MPIR  == "yes" ] && { build "MPIR" "static"; build "MPIR" "shared"; }
-[ $BUILD_MPFR  == "yes" ] && build "MPFR" "static&shared"
+[ $BUILD_MPFR  == "yes" ] && { build "MPFR" "static&shared"; }
 [ $BUILD_FLINT == "yes" ] && { build "FLINT" "static"; build "FLINT" "shared"; }
 [ $BUILD_ARB   == "yes" ] && { build "ARB" "static"; build "ARB" "shared"; }
 
 # copy FLINT and ARB shared libraries to bin folder
-[ -f $TARGET/lib/libflint.dll ] && exe "cp "$TARGET/lib/libflint.dll" "$TARGET/bin/flint.dll
-[ -f $TARGET/lib/libarb.dll   ] && exe "cp "$TARGET/lib/libarb.dll" "$TARGET/bin/arb.dll
+[ $BUILD_FLINT == "yes" ] && [ -f $TARGET/lib/libflint.dll ] && exe "cp "$TARGET/lib/libflint.dll" "$TARGET/bin/flint.dll
+[ $BUILD_ARB   == "yes" ] && [ -f $TARGET/lib/libarb.dll   ] && exe "cp "$TARGET/lib/libarb.dll" "$TARGET/bin/arb.dll
 
 # clean builds
 [ $CLEAN_ALL == "yes" ] || [ $CLEAN_GMP   == "yes" ] && exe "clean "$GMP
