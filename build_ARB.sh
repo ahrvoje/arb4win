@@ -7,7 +7,7 @@
 #  revisions: 09.10.2015
 #             03.04.2017
 #             10.02.2020 - use MSYS2 mingw, not Qt
-#             05.12.2021 - 64bit support, MPIR replacing GMP, joined static & shared MPFR builds, automatic ABI
+#             05.12.2021 - 64bit support, MPIR replacing GMP, joined static & shared MPFR builds, automatic ABI, stop on error
 #
 #  Configuration used at the latest revision:
 #    Windows 11 64-bit
@@ -82,6 +82,7 @@ function LOGcompilerinfo {
 function exe {
     LOG "$1"
     $1 >> "$LOGFILE" 2>&1
+    [ $? -ne 0 ] && { LOG "Some error occured! Stopping the build process..."; exit 1; }
 }
 
 # clean build folder
@@ -110,7 +111,7 @@ function build {
     exe "make"
 
     TO_CHECK="CHECK_$1"
-    [ "$TO_CHECK" == "yes" ] && [[ "$2" == *"shared"* ]] && { LOG "CHECKING $2 $1"; exe "make check"; }
+    [ ${!TO_CHECK} == "yes" ] && [[ "$2" == *"shared"* ]] && { LOG "CHECKING $2 $1"; exe "make check"; }
 
     LOG "INSTALLING $2 $1"
     exe "make install"
