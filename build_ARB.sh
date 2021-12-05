@@ -7,7 +7,7 @@
 #  revisions: 09.10.2015
 #             03.04.2017
 #             10.02.2020 - use MSYS2 mingw, not Qt
-#             05.12.2021 - 64bit support, MPIR replacing GMP, joined static & shared MPFR builds, autodetect ABI
+#             05.12.2021 - 64bit support, MPIR replacing GMP, joined static & shared MPFR builds, automatic ABI
 #
 #  Configuration used at the latest revision:
 #    Windows 11 64-bit
@@ -34,25 +34,25 @@ CLEAN_GMP="no"
 # modify if needed
 MPIR="$SOURCE"/mpir-3.0.0
 BUILD_MPIR="yes"
-CHECK_MPIR="no"
+CHECK_MPIR="yes"
 CLEAN_MPIR="no"
 
 # modify if needed
 MPFR="$SOURCE"/mpfr-4.1.0
 BUILD_MPFR="yes"
-CHECK_MPFR="no"
+CHECK_MPFR="yes"
 CLEAN_MPFR="no"
 
 # modify if needed
 FLINT="$SOURCE"/flint-2.8.4
 BUILD_FLINT="yes"
-CHECK_FLINT="no"
+CHECK_FLINT="yes"
 CLEAN_FLINT="no"
 
 # modify if needed
 ARB="$SOURCE"/arb-2.21.1
 BUILD_ARB="yes"
-CHECK_ARB="no"
+CHECK_ARB="yes"
 CLEAN_ARB="no"
 
 # modify if needed
@@ -63,7 +63,7 @@ function timestamp {
     date --rfc-3339=seconds
 }
 
-# adds RFC 3339 compliant timestamp to the message and prints to LOG and TIME file
+# adds RFC 3339 compliant timestamp to all logs, and prints in STDOUT, and LOG & TIME files
 function LOG {
     STAMPED="$(timestamp) $1"
 
@@ -72,7 +72,6 @@ function LOG {
     echo "$STAMPED" >> "$TIMEFILE"
 }
 
-# logs compiler info
 function LOGcompilerinfo {
     LOG "Compiler info:"
     LOG "    $(gcc -v 2>&1 | grep "gcc version")"
@@ -111,7 +110,7 @@ function build {
     exe "make"
 
     TO_CHECK="CHECK_$1"
-    [ "$TO_CHECK" == "yes" ] && (LOG "CHECKING $2 $1"; exe "make check")
+    [ "$TO_CHECK" == "yes" ] && [[ "$2" == *"shared"* ]] && { LOG "CHECKING $2 $1"; exe "make check"; }
 
     LOG "INSTALLING $2 $1"
     exe "make install"
@@ -125,8 +124,11 @@ TIMEFILE="/var/log/build_ARB_time.log"
 [ -f "$TIMEFILE" ] && rm "$TIMEFILE"
 
 ARCH="$(gcc -v 2>&1 | grep "Target")"
-[[ $ARCH == *" i686"*   ]] && (ABI=32; TARGET=/opt/i686)
-[[ $ARCH == *" x86_64"* ]] && (ABI=64; TARGET=/opt/x86_64)
+[[ "$ARCH" == *" i686"*   ]] && { ABI=32; TARGET=/opt/i686; }
+[[ "$ARCH" == *" x86_64"* ]] && { ABI=64; TARGET=/opt/x86_64; }
+
+# expand PATH for tests to be able to use built libs
+PATH=$PATH:$TARGET/lib:$TARGET/bin
 
 LOGcompilerinfo
 LOG "SOURCE=$SOURCE"
@@ -134,7 +136,7 @@ LOG "TARGET=$TARGET"
 LOG "ABI=$ABI"
 
 # delete old builds
-[ "$DELETE_OLD_BUILDS" == "yes" ] && [ -d "$TARGET" ] && (LOG "Deleting old builds... "; rm -r "$TARGET")
+[ "$DELETE_OLD_BUILDS" == "yes" ] && [ -d "$TARGET" ] && { LOG "Deleting old builds... "; exe "rm -r "$TARGET""; }
 
 # configure parameters
 GMP_PARAMS="--enable-cxx"
@@ -144,11 +146,11 @@ FLINT_PARAMS="--with-mpir="$TARGET" --with-mpfr="$TARGET""
 ARB_PARAMS="--with-mpir="$TARGET" --with-mpfr="$TARGET" --with-flint="$TARGET" CFLAGS=-Wno-long-long"
 
 # build libs
-[ "$BUILD_GMP" == "yes"   ] && (build "GMP" "static" "$GMP_PARAMS"; build "GMP" "shared" "$GMP_PARAMS")
-[ "$BUILD_MPIR" == "yes"  ] && (build "MPIR" "static" "$MPIR_PARAMS"; build "MPIR" "shared" "$MPIR_PARAMS")
+[ "$BUILD_GMP" == "yes"   ] && { build "GMP" "static" "$GMP_PARAMS"; build "GMP" "shared" "$GMP_PARAMS"; }
+[ "$BUILD_MPIR" == "yes"  ] && { build "MPIR" "static" "$MPIR_PARAMS"; build "MPIR" "shared" "$MPIR_PARAMS"; }
 [ "$BUILD_MPFR" == "yes"  ] && build "MPFR" "static&shared" "$MPFR_PARAMS"
-[ "$BUILD_FLINT" == "yes" ] && (build "FLINT" "static" "$FLINT_PARAMS"; build "FLINT" "shared" "$FLINT_PARAMS")
-[ "$BUILD_ARB" == "yes"   ] && (build "ARB" "static" "$ARB_PARAMS"; build "ARB" "shared" "$ARB_PARAMS")
+[ "$BUILD_FLINT" == "yes" ] && { build "FLINT" "static" "$FLINT_PARAMS"; build "FLINT" "shared" "$FLINT_PARAMS"; }
+[ "$BUILD_ARB" == "yes"   ] && { build "ARB" "static" "$ARB_PARAMS"; build "ARB" "shared" "$ARB_PARAMS"; }
 
 # copy FLINT and ARB shared libraries to bin folder
 [ -f "$TARGET/lib/libflint.dll" ] && exe "cp $TARGET/lib/libflint.dll $TARGET/bin/flint.dll"
