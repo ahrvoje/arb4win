@@ -1,50 +1,43 @@
-# GMP, MPFR, FLINT &amp; ARB for Windows
+# GMP, MPIR, MPFR, FLINT &amp; ARB for Windows
 
 ## Introduction
 
-GMP, MPFR, FLINT and ARB are well known numerical libraries for large integer and arbitrary precision floating point arithmetic. A special emphasis is given to _ball arithmetic_ library [ARB](https://github.com/fredrik-johansson/arb/) by Frederik Johansson.
+GMP, MPIR, MPFR, FLINT and ARB are well known numerical libraries for large integer and arbitrary precision floating point arithmetic. A special emphasis is given to _ball arithmetic_ library [ARB](https://github.com/fredrik-johansson/arb/) by Frederik Johansson.
 
-The repository doesn't contribute to the functionality, but is a guide for building 32-bit libs for Windows.
+The repository doesn't contribute to the functionality, but is a guide for building 32-bit & 64-bit static and shared libraries for Windows.
 
 ## System and environment
 
-- MSYS2 including **m4**, **make**, **diffutils** and **mingw-w64-i686-gcc**
+- Windows 11 64-bit
+- MSYS2 with **base-devel**, **mingw-w64-i686-gcc**, **mingw-w64-x86_64-gcc**, **yasm**
 - versions used for current builds:
-   - GMP v6.2.1 ([https://gmplib.org/#DOWNLOAD](https://gmplib.org/#DOWNLOAD))
+   - MPIR v3.0.0 ([https://mpir.org/downloads.html](https://mpir.org/downloads.html))
    - MPFR v4.1.0 ([http://www.mpfr.org/mpfr-current/](http://www.mpfr.org/mpfr-current/))
    - FLINT v2.8.4 ([http://flintlib.org/downloads.html](http://flintlib.org/downloads.html))
    - ARB v2.21.1 ([https://github.com/fredrik-johansson/arb/](https://github.com/fredrik-johansson/arb/))
 - **_build_ARB.sh_**
-- Windows 11 64-bit
-- gcc compiler (via MSYS2):
-   - gcc.exe (Rev2, Built by MSYS2 project) 11.2.0
-   - Target: i686-w64-mingw32
 
-Cygwin isn't used as it does not handle symbolic links used by some **configure** and **make** scripts in a desirable way. MSYS2 solves this issue by implementing customized **ln** command which simply creates hard-copies.
-
-The libraries are not 64-bit Windows safe so the entire workflow is adapted to 32-bit building process (configuration parameter `ABI=32` is set for all of them). Consequently, if one builds against the static libraries, `-m32` gcc/g++ compiler switch sometimes has to be used.
+Cygwin isn't used as it does not handle symbolic links used by some **configure** and **make** scripts in a desirable way, and is generaly not intended to be used as Windows build environment. MSYS2 solves the issue by implementing customized **ln** command which simply creates hard-copies.
 
 ## Workflow
 
-1. Install MSYS2, update and install **m4**, **make**, **difftools** and **mingw-w64-i686-gcc**
-2. Extract GMP, MPFR, FLINT & ARB src into **_/opt/src_** folder.
-3. Check and adapt `SOURCE` & `TARGET` variables in **_build_ARB.sh_** to set the desired source and target folders, e.g. `SOURCE=/opt/src` and `TARGET=/opt`. Also, every library can be set to be build in static or shared form and checked by available set of tests. One can control this by setting corresponding `ERASE`, `BUILD`, `CHECK` & `CLEAN` variables to "yes"/"no" value.
-4. Finally, after starting MSYS2 mingw32 shell (**mingw32.exe**), execute the following command and the build process will start:
+1. Install MSYS2, update it, and install **base-devel**, **mingw-w64-i686-gcc**, **mingw-w64-x86_64-gcc**, **yasm**
+2. Extract MPIR, MPFR, FLINT & ARB src into **_/opt/src_** folder.
+3. Check and adapt `SOURCE` variable in **_build_ARB.sh_**, e.g. `SOURCE=/opt/src`.
+4. Finally, after starting MSYS2 **mingw32.exe** shell for 32-bit or **mingw64.exe** shell for 64-bit build, execute the following command and the build process will start:
 ```
 $ build_ARB.sh
 ```
 **_build_ARB.sh_** automatically executes the entire workflow with timing & log files written to **_/var/log_** folder.
 
-Applications built using **_arb_** and **_flint_** static libraries expect to find **_libmpfr-6.dll_** in local folder or system **_PATH_**.
-
 ## Deliverables
 
-Once built, the following folders contain the files needed to use the libraries.
+Once built, **_i686_** or **_x86_64_** folder will be created in **_/opt_** based on the build bitness. The following folders contain the files needed to use the libraries. **_lib_** is not part of this repository, and have to be rebuild specificaly for a needed purpose.
 
-**_/opt/bin_** contains shared libraries (**_libgmp-10.dll_**, **_libgmpxx-4.dll_**, **_libmpfr-6.dll_**, **_flint.dll_**, **_arb.dll_**).
-**_/opt/include_** contains header files needed to build against the libraries.
-**_/opt/lib_** contains static libraries for compiler and target defined in **_build_ARB.sh_**.
-**_/opt/shared_** contains some documentation automatically generated during build process.
+**_/opt/$arch/bin_** contains shared libraries (**_libmpir-23.dll_**, **_libgmp-23.dll_**, **_libmpfr-6.dll_**, **_flint.dll_**, **_arb.dll_**).
+**_/opt/$arch/include_** contains header files needed to build against the libraries.
+**_/opt/$arch/lib_** contains static libraries for compiler and target defined in **_build_ARB.sh_**.
+**_/opt/$arch/shared_** contains some documentation automatically generated during build process.
 
 ## Demo
 
@@ -52,8 +45,10 @@ In this demo we evaluate one simple _pandigital approximation_ of natural consta
 
 ![equation](approx.png)
 
-### Static version
+### Static
 ```
+#include <stdlib.h>
+
 #include "arb.h"
 
 
@@ -97,17 +92,16 @@ int main()
 	arb_clear(x);
 	arb_clear(t);
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 ```
-Demo is compiled by the following command line in MSYS2 mingw32 environment.
+32-bit demo is compiled using **build_arb_demo_32.sh** or via the following command line in MSYS2 mingw32 environment.
 ```
-$ gcc -I/usr/var/include arb_demo.c -L/usr/var/lib -larb -lflint -lmpfr -lgmp
+$ gcc -Ibuild/i686/include arb_demo.c -obuild/i686/bin/static_demo.exe -Lbuild/i686/lib -larb -lflint -lmpfr -lgmp
 ```
-Before starting the application make sure **_libmpfr-6.dll_** is in the local folder or available via **_PATH_**. And the result is:
 ```
-$ ./a.exe
-Computed with Arb 2.21.1
+$ ./static_demo.exe
+Computed with 32-bit Arb 2.21.1
 a   = 1.0000000000000000000000132348898008484427979425390731 +/- 0
 b   = 75557863725914323419136.5 +/- 0
 x   = 2.718281828459045235360287471352662497757247093739638 +/- 1.1407e-300
@@ -115,7 +109,7 @@ e   = 2.7182818284590452353602874713526624977572470936999596 +/- 3.7331e-301
 x-e = 3.9678376581476207465438603498757884997818078351607135e-47 +/- 1.514e-300
 ```
 
-### Dynamic version for Windows
+### Shared (dynamic) for Windows
 
 ```
 #include <windows.h>
@@ -132,7 +126,7 @@ int main()
 		printf("Error code: %ld\n", GetLastError());
 		printf("https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes\n");
 
-		return 1;
+		return EXIT_FAILURE;
 	}
 
 	char* arb_version_d = *( (char**) GetProcAddress(hArb, "arb_version"));
@@ -196,16 +190,16 @@ int main()
 
 	FreeLibrary(hArb);
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 ```
+32-bit demo is compiled using **build_arb_dll_demo_32.sh** or via the following command line in MSYS2 mingw32 environment.
 ```
-$ gcc -I/var/local/include arb_dll_demo.c
+$ gcc -Ibuild/i686/include arb_dll_demo.c -obuild/i686/bin/shared_demo.exe
 ```
-The application expects **_libmpfr-6.dll_** and **_arb.dll_** DLLs available in local folder or **_PATH_**.
 ```
-$ ./a.exe
-Computed with Arb 2.21.1
+$ ./shared_demo.exe
+Computed with 32-bit Arb 2.21.1
 a   = 1.0000000000000000000000132348898008484427979425390731 +/- 0
 b   = 75557863725914323419136.5 +/- 0
 x   = 2.718281828459045235360287471352662497757247093739638 +/- 1.1407e-300
