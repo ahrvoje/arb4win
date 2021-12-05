@@ -45,7 +45,7 @@ In this demo we evaluate one simple _pandigital approximation_ of natural consta
 
 ![equation](approx.png)
 
-### Static version
+### Static
 ```
 #include <stdlib.h>
 
@@ -109,7 +109,7 @@ e   = 2.7182818284590452353602874713526624977572470936999596 +/- 3.7331e-301
 x-e = 3.9678376581476207465438603498757884997818078351607135e-47 +/- 1.514e-300
 ```
 
-### Dynamic version for Windows
+### Shared (dynamic) for Windows
 
 ```
 #include <windows.h>
