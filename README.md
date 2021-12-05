@@ -17,7 +17,7 @@ The repository doesn't contribute to the functionality, but is a guide for build
    - ARB v2.21.1 ([https://github.com/fredrik-johansson/arb/](https://github.com/fredrik-johansson/arb/))
 - **_build_ARB.sh_**
 
-Cygwin isn't used as it does not handle symbolic links used by some **configure** and **make** scripts in a desirable way. MSYS2 solves this issue by implementing customized **ln** command which simply creates hard-copies, and is generaly not intended to be used as Windows build environment.
+Cygwin isn't used as it does not handle symbolic links used by some **configure** and **make** scripts in a desirable way, and is generaly not intended to be used as Windows build environment. MSYS2 solves the issue by implementing customized **ln** command which simply creates hard-copies.
 
 ## Workflow
 
