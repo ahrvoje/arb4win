@@ -92,7 +92,7 @@ int main()
 	arb_clear(x);
 	arb_clear(t);
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 ```
 32-bit demo is compiled using **build_arb_demo_32.sh** or via the following command line in MSYS2 mingw32 environment.
