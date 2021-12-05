@@ -32,7 +32,7 @@ $ build_ARB.sh
 
 ## Deliverables
 
-Once built, **i686** or **x86_64** folder will be created based on the build bitness. the following folders contain the files needed to use the libraries.
+Once built, **_i686_** or **_x86_64_** folder will be created in **_/opt_** based on the build bitness. The following folders contain the files needed to use the libraries. **_lib_** is not part of this repository, and have to be rebuild specificaly for a needed purpose.
 
 **_/opt/$arch/bin_** contains shared libraries (**_libmpir-23.dll_**, **_libgmp-23.dll_**, **_libmpfr-6.dll_**, **_flint.dll_**, **_arb.dll_**).
 **_/opt/$arch/include_** contains header files needed to build against the libraries.
