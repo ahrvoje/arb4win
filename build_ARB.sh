@@ -19,7 +19,9 @@
 #      - install mingw64: pacman -S mingw-w64-x86_64-gcc
 #      - install yasm   : pacman -S yasm
 
-[ $(uname -o) != Msys ] && { echo "MSYS environment required. Exiting..."; exit 1; }
+[[ $(uname -o) != Msys     ]] && { echo "MSYS environment required. Exiting..."; exit 1; }
+[[ $(uname)    == MINGW32* ]] && { ABI=32; TARGET=/opt/i686; }
+[[ $(uname)    == MINGW64* ]] && { ABI=64; TARGET=/opt/x86_64; }
 
 # modify if needed
 SOURCE=/opt/src
@@ -104,7 +106,7 @@ function build {
     PARAMS=$1"_PARAMS"
     exe "./configure ABI="$ABI" --prefix="$TARGET" ${!PARAMS} $STATIC_SHARED"
     [ $? != 0 ] && { LOG "Configuration error occured. Stopping build process..."; exit 1; }
-    
+
     LOG "MAKING "$2" "$1
     exe "make"
     [ $? != 0 ] && { LOG "Make error occured. Stopping build process..."; exit 1; }
@@ -126,9 +128,6 @@ LOGFILE=/var/log/build_ARB.log
 [ -f $LOGFILE ] && rm $LOGFILE
 TIMEFILE=/var/log/build_ARB_time.log
 [ -f $TIMEFILE ] && rm $TIMEFILE
-
-[[ $(uname) == MINGW32* ]] && { ABI=32; TARGET=/opt/i686; }
-[[ $(uname) == MINGW64* ]] && { ABI=64; TARGET=/opt/x86_64; }
 
 # expand PATH to make new libs available for tests
 PATH=$PATH:$TARGET/lib:$TARGET/bin
