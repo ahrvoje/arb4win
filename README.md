@@ -1,8 +1,8 @@
-# GMP, MPIR, MPFR, FLINT &amp; ARB for Windows
+# GMP, MPFR, FLINT &amp; ARB for Windows
 
 ## Introduction
 
-GMP, MPIR, MPFR, FLINT and ARB are well known numerical libraries for large integer and arbitrary precision floating point arithmetic. A special emphasis is given to _ball arithmetic_ library [ARB](https://github.com/fredrik-johansson/arb/) by Frederik Johansson.
+GMP, MPFR, FLINT and ARB are well known numerical libraries for large integer and arbitrary precision floating point arithmetic. A special emphasis is given to _ball arithmetic_ library [ARB](https://github.com/fredrik-johansson/arb/) by Frederik Johansson.
 
 The repository doesn't contribute to the functionality, but is a guide for building 32-bit & 64-bit static and shared libraries for Windows.
 
@@ -11,7 +11,7 @@ The repository doesn't contribute to the functionality, but is a guide for build
 - Windows 11 64-bit
 - MSYS2 with **base-devel**, **mingw-w64-i686-gcc**, **mingw-w64-x86_64-gcc**, **yasm**
 - versions used for current builds:
-   - MPIR v3.0.0 ([https://mpir.org/downloads.html](https://mpir.org/downloads.html))
+   - GMP v6.3.0 ([https://gmplib.org/](https://gmplib.org/))
    - MPFR v4.1.0 ([http://www.mpfr.org/mpfr-current/](http://www.mpfr.org/mpfr-current/))
    - FLINT v2.8.4 ([http://flintlib.org/downloads.html](http://flintlib.org/downloads.html))
    - ARB v2.21.1 ([https://github.com/fredrik-johansson/arb/](https://github.com/fredrik-johansson/arb/))
@@ -22,19 +22,19 @@ Cygwin isn't used as it does not handle symbolic links used by some **configure*
 ## Workflow
 
 1. Install MSYS2, update it, and install **base-devel**, **mingw-w64-i686-gcc**, **mingw-w64-x86_64-gcc**, **yasm**
-2. Extract MPIR, MPFR, FLINT & ARB src into **_/opt/src_** folder.
-3. Check and adapt `SOURCE` variable in **_build_ARB.sh_**, e.g. `SOURCE=/opt/src`.
+2. Extract GMP, MPFR, FLINT & ARB src into MSYS2 **_/opt/src_** folder.
+3. Check and adapt `SOURCE` variable in **_build_ARB.sh_**, i.e. `SOURCE=/opt/src`.
 4. Finally, after starting MSYS2 **mingw32.exe** shell for 32-bit or **mingw64.exe** shell for 64-bit build, execute the following command and the build process will start:
 ```
 $ build_ARB.sh
 ```
-**_build_ARB.sh_** automatically executes the entire workflow with timing & log files written to **_/var/log_** folder.
+**_build_ARB.sh_** automatically executes the entire workflow with timing & log files written to MSYS2 **_/var/log_** folder.
 
 ## Deliverables
 
-Once built, **_i686_** or **_x86_64_** folder will be created in **_/opt_** based on the build bitness. The following folders contain the files needed to use the libraries. **_lib_** is not part of this repository, and have to be rebuild specificaly for a needed purpose.
+Once built, **_i686_** or **_x86_64_** folder will be created in MSYS2 **_/opt_** folder based on the build bitness. The following folders contain the files needed to use the libraries. **_lib_** is not part of this repository, and have to be rebuild specificaly for a needed purpose.
 
-**_/opt/$arch/bin_** contains shared libraries (**_libmpir-23.dll_**, **_libgmp-23.dll_**, **_libmpfr-6.dll_**, **_flint.dll_**, **_arb.dll_**).
+**_/opt/$arch/bin_** contains shared libraries (**_libgmp-23.dll_**, **_libgmp-23.dll_**, **_libmpfr-6.dll_**, **_flint.dll_**, **_arb.dll_**).
 **_/opt/$arch/include_** contains header files needed to build against the libraries.
 **_/opt/$arch/lib_** contains static libraries for compiler and target defined in **_build_ARB.sh_**.
 **_/opt/$arch/shared_** contains some documentation automatically generated during build process.
