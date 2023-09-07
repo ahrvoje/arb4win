@@ -121,10 +121,10 @@ x-e = 3.9678376581476207465438603498757884997818078351607135e-47 +/- 1.514e-300
 
 int main()
 {
-	HINSTANCE hArb = LoadLibrary(TEXT("arb.dll"));
+	HINSTANCE hArb = LoadLibrary(TEXT("libflint.dll"));
 
 	if (! hArb) {
-		printf("Error loading arb.dll\n");
+		printf("Error loading libflint.dll\n");
 		printf("Error code: %ld\n", GetLastError());
 		printf("https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes\n");
 
@@ -197,14 +197,14 @@ int main()
 ```
 32-bit demo is compiled using **build_arb_dll_demo_32.sh** or via the following command line in MSYS2 mingw32 environment.
 ```
-$ gcc -Ibuild/i686/include arb_dll_demo.c -obuild/i686/bin/shared_demo.exe
+$ gcc -Ibuild/i686/include -Ibuild/i686/include/flint arb_dll_demo.c -obuild/i686/bin/shared_demo.exe
 ```
 ```
-$ ./shared_demo.exe
-Computed with 32-bit Arb 2.21.1
+$ ./build/i686/bin/shared_demo.exe
+Computed with 32-bit Arb 2.23.0
 a   = 1.0000000000000000000000132348898008484427979425390731 +/- 0
-b   = 75557863725914323419136.5 +/- 0
-x   = 2.718281828459045235360287471352662497757247093739638 +/- 1.1407e-300
+b   = 75557863725914323419136.500000000000000000000000000000 +/- 0
+x   = 2.7182818284590452353602874713526624977572470937396380 +/- 1.1407e-300
 e   = 2.7182818284590452353602874713526624977572470936999596 +/- 3.7331e-301
-x-e = 3.9678376581476207465438603498757884997818078351607135e-47 +/- 1.514e-300
+x-e = 3.9678376581476207465438603498757884997818078351607135e-47 +/- 1.5140e-300
 ```
