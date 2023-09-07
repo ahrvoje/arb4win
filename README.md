@@ -1,23 +1,25 @@
-# GMP, MPFR, FLINT &amp; ARB for Windows
+# GMP, MPFR, FLINT (&amp; ARB) for Windows
 
 ## Introduction
 
 GMP, MPFR, FLINT and ARB are well known numerical libraries for large integer and arbitrary precision floating point arithmetic. A special emphasis is given to _ball arithmetic_ library [ARB](https://github.com/fredrik-johansson/arb/) by Frederik Johansson.
+
+**_Arb is merged with Flint 3.0.0 and is not available as a separate library since._**
 
 The repository doesn't contribute to the functionality, but is a guide for building 32-bit & 64-bit static and shared libraries for Windows.
 
 ## System and environment
 
 - Windows 11 64-bit
-- MSYS2 with **base-devel**, **mingw-w64-i686-gcc**, **mingw-w64-x86_64-gcc**, **yasm**
+- MSYS2 with **base-devel**, **mingw-w64-i686-gcc**, **mingw-w64-x86_64-gcc**, **yasm**, **m4**, **make**, **autotools**
 - versions used for current builds:
    - GMP v6.3.0 ([https://gmplib.org/](https://gmplib.org/))
-   - MPFR v4.1.0 ([http://www.mpfr.org/mpfr-current/](http://www.mpfr.org/mpfr-current/))
-   - FLINT v2.8.4 ([http://flintlib.org/downloads.html](http://flintlib.org/downloads.html))
-   - ARB v2.21.1 ([https://github.com/fredrik-johansson/arb/](https://github.com/fredrik-johansson/arb/))
+   - MPFR v4.2.1 ([http://www.mpfr.org/mpfr-current/](http://www.mpfr.org/mpfr-current/))
+   - FLINT v3.0.0-alpha1 ([http://flintlib.org/downloads.html](http://flintlib.org/downloads.html))
+   - with FLINT hosting ARB v2.23.0 ([https://github.com/fredrik-johansson/arb/](https://github.com/fredrik-johansson/arb/))
 - **_build_ARB.sh_**
 
-Cygwin isn't used as it does not handle symbolic links used by some **configure** and **make** scripts in a desirable way, and is generaly not intended to be used as Windows build environment. MSYS2 solves the issue by implementing customized **ln** command which simply creates hard-copies.
+Cygwin isn't used as it does not handle symbolic links used by some **configure** and **make** scripts in a desirable way, and is generaly not intended to be used as Windows build environment. MSYS2 solves the issues by implementing customized **ln** command which simply creates hard-copies and is designed as a build environment.
 
 ## Workflow
 
@@ -32,9 +34,9 @@ $ build_ARB.sh
 
 ## Deliverables
 
-Once built, **_i686_** or **_x86_64_** folder will be created in MSYS2 **_/opt_** folder based on the build bitness. The following folders contain the files needed to use the libraries. **_lib_** is not part of this repository, and have to be rebuild specificaly for a needed purpose.
+Once built, **_i686_** or **_x86_64_** folder will be created in MSYS2 **_/opt_** folder based on the compiler bitness ($arch).
 
-**_/opt/$arch/bin_** contains shared libraries (**_libgmp-23.dll_**, **_libgmp-23.dll_**, **_libmpfr-6.dll_**, **_flint.dll_**, **_arb.dll_**).
+**_/opt/$arch/bin_** contains shared libraries (**_libgmp-10.dll_**, **_libgmpxx-4.dll_**, **_libmpfr-6.dll_**, **_libflint.dll_**).
 **_/opt/$arch/include_** contains header files needed to build against the libraries.
 **_/opt/$arch/lib_** contains static libraries for compiler and target defined in **_build_ARB.sh_**.
 **_/opt/$arch/shared_** contains some documentation automatically generated during build process.
