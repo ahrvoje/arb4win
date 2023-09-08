@@ -1,6 +1,9 @@
 /*
     Copyright (C) 2010 Fredrik Johansson
 
+    2x2 mul code taken from MPFR 2.3.0
+    (Copyright (C) 1991-2007 Free Software Foundation, Inc.)
+
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
@@ -13,15 +16,12 @@
 #define MPN_EXTRAS_H
 
 #ifdef MPN_EXTRAS_INLINES_C
-#define MPN_EXTRAS_INLINE FLINT_DLL
+#define MPN_EXTRAS_INLINE
 #else
 #define MPN_EXTRAS_INLINE static __inline__
 #endif
 
-#include <gmp.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -47,6 +47,101 @@
 
 #define BITS_TO_LIMBS(b) (((b) + GMP_NUMB_BITS - 1) / GMP_NUMB_BITS)
 
+#define flint_mpn_mul_2x1(r2, r1, r0, a1, a0, b0)           \
+    do {                                                    \
+        mp_limb_t t1;                                       \
+        umul_ppmm(r1, r0, a0, b0);                          \
+        umul_ppmm(r2, t1, a1, b0);                          \
+        add_ssaaaa(r2, r1, r2, r1, 0, t1);                  \
+    } while (0)
+
+#define flint_mpn_mul_2x2(r3, r2, r1, r0, a1, a0, b1, b0)   \
+    do {                                                    \
+        mp_limb_t t1, t2, t3;                               \
+        umul_ppmm(r1, r0, a0, b0);                          \
+        umul_ppmm(r2, t1, a1, b0);                          \
+        add_ssaaaa(r2, r1, r2, r1, 0, t1);                  \
+        umul_ppmm(t1, t2, a0, b1);                          \
+        umul_ppmm(r3, t3, a1, b1);                          \
+        add_ssaaaa(r3, t1, r3, t1, 0, t3);                  \
+        add_ssaaaa(r2, r1, r2, r1, t1, t2);                 \
+        r3 += r2 < t1;                                      \
+    } while (0)
+
+#define FLINT_MPN_MUL_THRESHOLD 400
+
+mp_limb_t flint_mpn_mul_large(mp_ptr r1, mp_srcptr i1, mp_size_t n1, mp_srcptr i2, mp_size_t n2);
+
+MPN_EXTRAS_INLINE mp_limb_t
+flint_mpn_mul(mp_ptr z, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn)
+{
+    if (yn < FLINT_MPN_MUL_THRESHOLD)
+        return mpn_mul(z, x, xn, y, yn);
+    else
+        return flint_mpn_mul_large(z, x, xn, y, yn);
+}
+
+MPN_EXTRAS_INLINE void
+flint_mpn_mul_n(mp_ptr z, mp_srcptr x, mp_srcptr y, mp_size_t n)
+{
+    if (n < FLINT_MPN_MUL_THRESHOLD)
+        mpn_mul_n(z, x, y, n);
+    else
+        flint_mpn_mul_large(z, x, n, y, n);
+}
+
+MPN_EXTRAS_INLINE void
+flint_mpn_sqr(mp_ptr z, mp_srcptr x, mp_size_t n)
+{
+    if (n < FLINT_MPN_MUL_THRESHOLD)
+        mpn_sqr(z, x, n);
+    else
+        flint_mpn_mul_large(z, x, n, x, n);
+}
+
+#define FLINT_MPN_MUL_WITH_SPECIAL_CASES(_z, _x, _xn, _y, _yn) \
+    if ((_xn) == (_yn)) \
+    { \
+        if ((_xn) == 1) \
+        { \
+            umul_ppmm((_z)[1], (_z)[0], (_x)[0], (_y)[0]); \
+        } \
+        else if ((_xn) == 2) \
+        { \
+            mp_limb_t __tt_x1, __tt_x0, __tt_y1, __tt_y0; \
+            __tt_x0 = (_x)[0]; \
+            __tt_x1 = (_x)[1]; \
+            __tt_y0 = (_y)[0]; \
+            __tt_y1 = (_y)[1]; \
+            flint_mpn_mul_2x2((_z)[3], (_z)[2], (_z)[1], (_z)[0], __tt_x1, __tt_x0, __tt_y1, __tt_y0); \
+        } \
+        else if ((_xn) >= FLINT_MPN_MUL_THRESHOLD) \
+            flint_mpn_mul_large((_z), (_x), (_xn), (_y), (_yn)); \
+        else if ((_x) == (_y)) \
+            mpn_sqr((_z), (_x), (_xn)); \
+        else \
+            mpn_mul_n((_z), (_x), (_y), (_xn)); \
+    } \
+    else if ((_xn) > (_yn)) \
+    { \
+        if ((_yn) == 1) \
+            (_z)[(_xn) + (_yn) - 1] = mpn_mul_1((_z), (_x), (_xn), (_y)[0]); \
+        else if ((_yn) >= FLINT_MPN_MUL_THRESHOLD) \
+            flint_mpn_mul_large((_z), (_x), (_xn), (_y), (_yn)); \
+        else \
+            mpn_mul((_z), (_x), (_xn), (_y), (_yn)); \
+    } \
+    else \
+    { \
+        if ((_xn) == 1) \
+            (_z)[(_xn) + (_yn) - 1] = mpn_mul_1((_z), (_y), (_yn), (_x)[0]); \
+        else if ((_xn) >= FLINT_MPN_MUL_THRESHOLD) \
+            flint_mpn_mul_large((_z), (_y), (_yn), (_x), (_xn)); \
+        else \
+            mpn_mul((_z), (_y), (_yn), (_x), (_xn)); \
+    }
+
+
 /*
     return the high limb of a two limb left shift by n < GMP_LIMB_BITS bits.
     Note: if GMP_NAIL_BITS != 0, the rest of flint is already broken anyways.
@@ -69,6 +164,8 @@ mp_limb_t  __gmpn_modexact_1_odd(mp_srcptr src, mp_size_t size,
 #ifdef mpn_modexact_1_odd
 #define flint_mpn_divisible_1_p(x, xsize, d) (mpn_modexact_1_odd(x, xsize, d) == 0)
 #else
+#include "gmpcompat.h"
+
 MPN_EXTRAS_INLINE int
 flint_mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
 {
@@ -78,6 +175,22 @@ flint_mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
     return flint_mpz_divisible_ui_p(&s, d);
 }
 #endif
+
+/* todo: figure out how to call GMP's actual division code instead of mpn_tdiv_qr here */
+#ifndef mpn_tdiv_q
+/* substitute for mpir's mpn_tdiv_q */
+static __inline__ void
+mpn_tdiv_q(mp_ptr qp, mp_srcptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn)
+{
+    mp_ptr _scratch;
+    TMP_INIT;
+    TMP_START;
+    _scratch = (mp_ptr) TMP_ALLOC(dn * sizeof(mp_limb_t));
+    mpn_tdiv_qr(qp, _scratch, 0, np, nn, dp, dn);
+    TMP_END;
+}
+#endif
+
 
 MPN_EXTRAS_INLINE
 int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)
@@ -100,36 +213,36 @@ mp_size_t flint_mpn_divexact_1(mp_ptr x, mp_size_t xsize, mp_limb_t d)
     return xsize;
 }
 
-FLINT_DLL void flint_mpn_debug(mp_srcptr x, mp_size_t xsize);
+void flint_mpn_debug(mp_srcptr x, mp_size_t xsize);
 
-FLINT_DLL mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize,
+mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize,
 		                                      flint_bitcnt_t *bits);
 
-FLINT_DLL mp_size_t flint_mpn_remove_power_ascending(mp_ptr x,
+mp_size_t flint_mpn_remove_power_ascending(mp_ptr x,
 		    mp_size_t xsize, mp_ptr p, mp_size_t psize, ulong *exp);
 
-FLINT_DLL int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize,
+int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize,
 		                                   slong start, slong stop);
 
-FLINT_DLL int flint_mpn_factor_trial_tree(slong * factors,
+int flint_mpn_factor_trial_tree(slong * factors,
                             mp_srcptr x, mp_size_t xsize, slong num_primes);
 
-FLINT_DLL mp_size_t flint_mpn_fmms1(mp_ptr y, mp_limb_t a1, mp_srcptr x1,
+mp_size_t flint_mpn_fmms1(mp_ptr y, mp_limb_t a1, mp_srcptr x1,
                                       mp_limb_t a2, mp_srcptr x2, mp_size_t n);
 
-FLINT_DLL int flint_mpn_divides(mp_ptr q, mp_srcptr array1, 
+int flint_mpn_divides(mp_ptr q, mp_srcptr array1,
          mp_size_t limbs1, mp_srcptr arrayg, mp_size_t limbsg, mp_ptr temp);
 
-FLINT_DLL mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg,
+mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg,
 		                 mp_srcptr array1, mp_size_t limbs1,
 			   mp_srcptr array2, mp_size_t limbs2, mp_ptr temp);
 
-FLINT_DLL mp_size_t flint_mpn_gcd_full(mp_ptr arrayg, 
+mp_size_t flint_mpn_gcd_full(mp_ptr arrayg,
     mp_srcptr array1, mp_size_t limbs1, mp_srcptr array2, mp_size_t limbs2);
 
-FLINT_DLL mp_limb_t flint_mpn_preinv1(mp_limb_t d, mp_limb_t d2);
+mp_limb_t flint_mpn_preinv1(mp_limb_t d, mp_limb_t d2);
 
-FLINT_DLL mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, 
+mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a,
            mp_size_t m, mp_srcptr b, mp_size_t n, mp_limb_t dinv);
 
 #define flint_mpn_divrem21_preinv(q, a_hi, a_lo, dinv) \
@@ -141,23 +254,23 @@ FLINT_DLL mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a,
       add_ssaaaa((q), __q2, (q), __q2, (a_hi), (a_lo)); \
    } while (0)
 
-FLINT_DLL void flint_mpn_mulmod_preinv1(mp_ptr r, 
-        mp_srcptr a, mp_srcptr b, mp_size_t n, 
+void flint_mpn_mulmod_preinv1(mp_ptr r,
+        mp_srcptr a, mp_srcptr b, mp_size_t n,
         mp_srcptr d, mp_limb_t dinv, ulong norm);
 
-FLINT_DLL void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n);
+void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n);
 
-FLINT_DLL void flint_mpn_mod_preinvn(mp_ptr r, mp_srcptr a, mp_size_t m, 
+void flint_mpn_mod_preinvn(mp_ptr r, mp_srcptr a, mp_size_t m,
                                      mp_srcptr d, mp_size_t n, mp_srcptr dinv);
 
-FLINT_DLL mp_limb_t flint_mpn_divrem_preinvn(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t m, 
+mp_limb_t flint_mpn_divrem_preinvn(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t m,
                                      mp_srcptr d, mp_size_t n, mp_srcptr dinv);
 
-FLINT_DLL void flint_mpn_mulmod_preinvn(mp_ptr r, 
-        mp_srcptr a, mp_srcptr b, mp_size_t n, 
+void flint_mpn_mulmod_preinvn(mp_ptr r,
+        mp_srcptr a, mp_srcptr b, mp_size_t n,
         mp_srcptr d, mp_srcptr dinv, ulong norm);
 
-FLINT_DLL int flint_mpn_mulmod_2expp1_basecase(mp_ptr xp, mp_srcptr yp, mp_srcptr zp, 
+int flint_mpn_mulmod_2expp1_basecase(mp_ptr xp, mp_srcptr yp, mp_srcptr zp,
     int c, flint_bitcnt_t b, mp_ptr tp);
 
 MPN_EXTRAS_INLINE
@@ -261,8 +374,8 @@ t##subtract:                                                                \
         int t##ncnt, t##dcnt;                                               \
         mp_limb_t t##qq = 0;                                                \
                                                                             \
-        count_leading_zeros(t##ncnt, t##r1);                                \
-        count_leading_zeros(t##dcnt, t##b1);                                \
+        t##ncnt = flint_clz(t##r1);                                \
+        t##dcnt = flint_clz(t##b1);                                \
         t##dcnt -= t##ncnt;                                                 \
         if (t##dcnt <= 0)                                                   \
             goto t##subtract;                                               \

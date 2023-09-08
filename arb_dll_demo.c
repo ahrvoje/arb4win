@@ -5,10 +5,10 @@
 
 int main()
 {
-    HINSTANCE hArb = LoadLibrary(TEXT("arb.dll"));
+    HINSTANCE hArb = LoadLibrary(TEXT("libflint.dll"));
 
     if (! hArb) {
-        printf("Error loading arb.dll\n");
+        printf("Error loading libflint.dll\n");
         printf("Error code: %ld\n", GetLastError());
         printf("https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes\n");
 

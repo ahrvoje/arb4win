@@ -13,18 +13,11 @@
 #define PERM_H
 
 #ifdef PERM_INLINES_C
-#define PERM_INLINE FLINT_DLL
+#define PERM_INLINE
 #else
 #define PERM_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#define ulong mp_limb_t
 
 #include "flint.h"
 
@@ -142,11 +135,11 @@ _perm_compose(slong *res, const slong *vec1, const slong *vec2, slong n)
 
 /* Randomisation *************************************************************/
 
-FLINT_DLL int _perm_randtest(slong * vec, slong n, flint_rand_t state);
+int _perm_randtest(slong * vec, slong n, flint_rand_t state);
 
 /* Parity ********************************************************************/
 
-FLINT_DLL int _perm_parity(const slong * vec, slong n);
+int _perm_parity(const slong * vec, slong n);
 
 /* Input and output **********************************************************/
 

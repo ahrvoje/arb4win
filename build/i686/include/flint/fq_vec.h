@@ -13,14 +13,14 @@
 #define FQ_VEC_H
 
 #ifdef FQ_VEC_INLINES_C
-#define FQ_VEC_TEMPLATES_INLINE FLINT_DLL
-#define FQ_VEC_INLINE FLINT_DLL
+#define FQ_VEC_TEMPLATES_INLINE
+#define FQ_VEC_INLINE
 #else
 #define FQ_VEC_TEMPLATES_INLINE static __inline__
 #define FQ_VEC_INLINE static __inline__
 #endif
 
-#include "fq.h"
+#include "fq_types.h"
 
 #define FQ_VEC_NORM(vec, i, ctx)                    \
 do {                                                \

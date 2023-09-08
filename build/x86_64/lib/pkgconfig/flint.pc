@@ -1,0 +1,11 @@
+prefix=/opt/x86_64
+exec_prefix=${prefix}
+includedir=${prefix}/include
+libdir=${exec_prefix}/lib
+
+Name: FLINT
+Description: Fast Library for Number Theory
+Version: 3.0.0-alpha1
+URL: https://flintlib.org/
+Cflags: -I${includedir}
+Libs: -L${libdir} -lgmp -lmpfr

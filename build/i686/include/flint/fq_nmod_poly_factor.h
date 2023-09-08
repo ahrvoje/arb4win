@@ -13,27 +13,16 @@
 #define FQ_NMOD_POLY_FACTOR_H
 
 #ifdef FQ_NMOD_POLY_FACTOR_INLINES_C
-#define FQ_POLY_FACTOR_TEMPLATES_INLINE FLINT_DLL
-#define FQ_NMOD_POLY_FACTOR_INLINE FLINT_DLL
+#define FQ_POLY_FACTOR_TEMPLATES_INLINE
+#define FQ_NMOD_POLY_FACTOR_INLINE
 #else
 #define FQ_POLY_FACTOR_TEMPLATES_INLINE static __inline__
 #define FQ_NMOD_POLY_FACTOR_INLINE static __inline__
 #endif
 
-FQ_NMOD_POLY_FACTOR_INLINE
-int FQ_NMOD_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_nmod_ctx_t ctx, slong length)
-{
-    int result;
-    fmpz_t q;
-    fmpz_init(q);
-    fq_nmod_ctx_order(q, ctx);
-    if ( 2 * fmpz_sizeinbase(q, 2) < 3 * (n_sqrt(length) + 1))
-        result = 1;
-    else
-        result = 0;
-    fmpz_clear(q);
-    return result;
-}
+#include "fq_nmod_types.h"
+
+int FQ_NMOD_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_nmod_ctx_t ctx, slong length);
 
 #ifdef T
 #undef T
@@ -47,7 +36,7 @@ int FQ_NMOD_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_nmod_ctx_t ctx, slong length
 
 /* Inlines *******************************************************************/
 
-FLINT_DLL void fq_nmod_poly_factor_get_poly(fq_nmod_poly_t z,
+void fq_nmod_poly_factor_get_poly(fq_nmod_poly_t z,
             const fq_nmod_poly_factor_t fac, slong i, const fq_nmod_ctx_t ctx);
 
 #endif

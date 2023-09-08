@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009, 2010, 2011 Sebastian Pancratz
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -13,33 +14,16 @@
 #define FMPZ_POLY_Q_H
 
 #ifdef FMPZ_POLY_Q_INLINES_C
-#define FMPZ_POLY_Q_INLINE FLINT_DLL
+#define FMPZ_POLY_Q_INLINE
 #else
 #define FMPZ_POLY_Q_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#undef ulong
-#include <gmp.h>
-#define ulong mp_limb_t
-
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_poly.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
-
-typedef struct
-{
-    fmpz_poly_struct *num;
-    fmpz_poly_struct *den;
-} fmpz_poly_q_struct;
-
-typedef fmpz_poly_q_struct fmpz_poly_q_t[1];
 
 /* Accessing numerator and denominator ***************************************/
 
@@ -47,33 +31,33 @@ typedef fmpz_poly_q_struct fmpz_poly_q_t[1];
 
 #define fmpz_poly_q_denref(op)  ((op)->den)
 
-FLINT_DLL void fmpz_poly_q_canonicalise(fmpz_poly_q_t rop);
+void fmpz_poly_q_canonicalise(fmpz_poly_q_t rop);
 
-FLINT_DLL int fmpz_poly_q_is_canonical(const fmpz_poly_q_t op);
+int fmpz_poly_q_is_canonical(const fmpz_poly_q_t op);
 
 /* Memory management *********************************************************/
 
-FLINT_DLL void fmpz_poly_q_init(fmpz_poly_q_t rop);
+void fmpz_poly_q_init(fmpz_poly_q_t rop);
 
-FLINT_DLL void fmpz_poly_q_clear(fmpz_poly_q_t rop);
+void fmpz_poly_q_clear(fmpz_poly_q_t rop);
 
 /* Randomisation *************************************************************/
 
-FLINT_DLL void fmpz_poly_q_randtest(fmpz_poly_q_t poly, flint_rand_t state,
-                          slong len1, flint_bitcnt_t bits1, 
+void fmpz_poly_q_randtest(fmpz_poly_q_t poly, flint_rand_t state,
+                          slong len1, flint_bitcnt_t bits1,
                           slong len2, flint_bitcnt_t bits2);
 
-FLINT_DLL void fmpz_poly_q_randtest_not_zero(fmpz_poly_q_t poly, flint_rand_t state, 
-                                   slong len1, flint_bitcnt_t bits1, 
+void fmpz_poly_q_randtest_not_zero(fmpz_poly_q_t poly, flint_rand_t state,
+                                   slong len1, flint_bitcnt_t bits1,
                                    slong len2, flint_bitcnt_t bits2);
 
 /* Assignment ****************************************************************/
 
-FLINT_DLL void fmpz_poly_q_set(fmpz_poly_q_t rop, const fmpz_poly_q_t op);
+void fmpz_poly_q_set(fmpz_poly_q_t rop, const fmpz_poly_q_t op);
 
-FLINT_DLL void fmpz_poly_q_set_si(fmpz_poly_q_t rop, slong op);
+void fmpz_poly_q_set_si(fmpz_poly_q_t rop, slong op);
 
-FLINT_DLL void fmpz_poly_q_swap(fmpz_poly_q_t op1, fmpz_poly_q_t op2);
+void fmpz_poly_q_swap(fmpz_poly_q_t op1, fmpz_poly_q_t op2);
 
 FMPZ_POLY_Q_INLINE
 void fmpz_poly_q_zero(fmpz_poly_q_t rop)
@@ -96,7 +80,7 @@ void fmpz_poly_q_neg(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
     fmpz_poly_set(rop->den, op->den);
 }
 
-FLINT_DLL void fmpz_poly_q_inv(fmpz_poly_q_t rop, const fmpz_poly_q_t op);
+void fmpz_poly_q_inv(fmpz_poly_q_t rop, const fmpz_poly_q_t op);
 
 /* Comparison ****************************************************************/
 
@@ -120,58 +104,65 @@ int fmpz_poly_q_equal(const fmpz_poly_q_t op1, const fmpz_poly_q_t op2)
 
 /* Addition and subtraction **************************************************/
 
-FLINT_DLL void fmpz_poly_q_add_in_place(fmpz_poly_q_t rop, const fmpz_poly_q_t op);
-FLINT_DLL void fmpz_poly_q_sub_in_place(fmpz_poly_q_t rop, const fmpz_poly_q_t op);
+void fmpz_poly_q_add_in_place(fmpz_poly_q_t rop, const fmpz_poly_q_t op);
+void fmpz_poly_q_sub_in_place(fmpz_poly_q_t rop, const fmpz_poly_q_t op);
 
-FLINT_DLL void fmpz_poly_q_add(fmpz_poly_q_t rop, const fmpz_poly_q_t op1, const fmpz_poly_q_t op2);
-FLINT_DLL void fmpz_poly_q_sub(fmpz_poly_q_t rop, const fmpz_poly_q_t op1, const fmpz_poly_q_t op2);
+void fmpz_poly_q_add(fmpz_poly_q_t rop, const fmpz_poly_q_t op1, const fmpz_poly_q_t op2);
+void fmpz_poly_q_sub(fmpz_poly_q_t rop, const fmpz_poly_q_t op1, const fmpz_poly_q_t op2);
 
-FLINT_DLL void fmpz_poly_q_addmul(fmpz_poly_q_t rop, const fmpz_poly_q_t op1, const fmpz_poly_q_t op2);
-FLINT_DLL void fmpz_poly_q_submul(fmpz_poly_q_t rop, const fmpz_poly_q_t op1, const fmpz_poly_q_t op2);
+void fmpz_poly_q_addmul(fmpz_poly_q_t rop, const fmpz_poly_q_t op1, const fmpz_poly_q_t op2);
+void fmpz_poly_q_submul(fmpz_poly_q_t rop, const fmpz_poly_q_t op1, const fmpz_poly_q_t op2);
 
 /* Scalar multiplication and division ****************************************/
 
-FLINT_DLL void fmpz_poly_q_scalar_mul_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, slong x);
-FLINT_DLL void fmpz_poly_q_scalar_mul_mpz(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const mpz_t x);
-FLINT_DLL void fmpz_poly_q_scalar_mul_mpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const mpq_t x);
+void fmpz_poly_q_scalar_mul_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, slong x);
+void fmpz_poly_q_scalar_mul_fmpz(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmpz_t x);
+void fmpz_poly_q_scalar_mul_fmpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmpq_t x);
 
-FLINT_DLL void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, slong x);
-FLINT_DLL void fmpz_poly_q_scalar_div_mpz(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const mpz_t x);
-FLINT_DLL void fmpz_poly_q_scalar_div_mpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const mpq_t x);
+void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, slong x);
+void fmpz_poly_q_scalar_div_fmpz(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmpz_t x);
+void fmpz_poly_q_scalar_div_fmpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmpq_t x);
 
 /* Multiplication and division ***********************************************/
 
-FLINT_DLL void fmpz_poly_q_mul(fmpz_poly_q_t rop, 
+void fmpz_poly_q_mul(fmpz_poly_q_t rop,
                      const fmpz_poly_q_t op1, const fmpz_poly_q_t op2);
 
-FLINT_DLL void fmpz_poly_q_div(fmpz_poly_q_t rop, 
+void fmpz_poly_q_div(fmpz_poly_q_t rop,
                      const fmpz_poly_q_t op1, const fmpz_poly_q_t op2);
 
 /* Powering ******************************************************************/
 
-FLINT_DLL void fmpz_poly_q_pow(fmpz_poly_q_t rop, const fmpz_poly_q_t op, ulong exp);
+void fmpz_poly_q_pow(fmpz_poly_q_t rop, const fmpz_poly_q_t op, ulong exp);
 
 /* Derivative ****************************************************************/
 
-FLINT_DLL void fmpz_poly_q_derivative(fmpz_poly_q_t rop, const fmpz_poly_q_t op);
+void fmpz_poly_q_derivative(fmpz_poly_q_t rop, const fmpz_poly_q_t op);
 
 /* Evaluation ****************************************************************/
 
-FLINT_DLL int fmpz_poly_q_evaluate(mpq_t rop, const fmpz_poly_q_t f, const mpq_t a);
+int fmpz_poly_q_evaluate_fmpq(fmpq_t rop, const fmpz_poly_q_t f, const fmpq_t a);
 
 /* Input and output **********************************************************/
 
-FLINT_DLL int fmpz_poly_q_set_str(fmpz_poly_q_t rop, const char *s);
+int fmpz_poly_q_set_str(fmpz_poly_q_t rop, const char *s);
 
-FLINT_DLL char * fmpz_poly_q_get_str(const fmpz_poly_q_t op);
-FLINT_DLL char * fmpz_poly_q_get_str_pretty(const fmpz_poly_q_t op, const char *x);
+char * fmpz_poly_q_get_str(const fmpz_poly_q_t op);
+char * fmpz_poly_q_get_str_pretty(const fmpz_poly_q_t op, const char *x);
 
-FLINT_DLL int fmpz_poly_q_print(const fmpz_poly_q_t op);
-FLINT_DLL int fmpz_poly_q_print_pretty(const fmpz_poly_q_t op, const char *x);
+int fmpz_poly_q_print(const fmpz_poly_q_t op);
+int fmpz_poly_q_print_pretty(const fmpz_poly_q_t op, const char *x);
+
+/* Declare old functions dead *************************************************/
+
+#define fmpz_poly_q_scalar_mul_mpz _Pragma("GCC error \"'fmpz_poly_q_scalar_mul_mpz' is deprecated. Use 'fmpz_poly_q_scalar_mul_fmpz' instead.\"")
+#define fmpz_poly_q_scalar_mul_mpq _Pragma("GCC error \"'fmpz_poly_q_scalar_mul_mpq' is deprecated. Use 'fmpz_poly_q_scalar_mul_fmpq' instead.\"")
+#define fmpz_poly_q_scalar_div_mpz _Pragma("GCC error \"'fmpz_poly_q_scalar_div_mpz' is deprecated. Use 'fmpz_poly_q_scalar_div_fmpz' instead.\"")
+#define fmpz_poly_q_scalar_div_mpq _Pragma("GCC error \"'fmpz_poly_q_scalar_div_mpq' is deprecated. Use 'fmpz_poly_q_scalar_div_fmpq' instead.\"")
+#define fmpz_poly_q_evaluate _Pragma("GCC error \"'fmpz_poly_q_evaluate' is deprecated. Use 'fmpz_poly_q_evaluate_fmpq' instead.\"")
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-

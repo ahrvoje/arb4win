@@ -13,18 +13,9 @@
 #ifndef QSIEVE_H
 #define QSIEVE_H
 
-#include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
 #include <stdint.h>
-
-#include "flint.h"
-#include "fmpz.h"
-#include "ulong_extras.h"
-#include "fmpz_vec.h"
-#include "fmpz_factor.h"
-#include "thread_support.h"
+#include "thread_pool.h"
+#include "fmpz_types.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -36,20 +27,20 @@
 
 #define BLOCK_SIZE (4*65536) /* size of sieving cache block */
 
-typedef struct prime_t
+typedef struct
 {
    mp_limb_t pinv;     /* precomputed inverse */
    int p;              /* prime */
    char size;
 } prime_t;
 
-typedef struct fac_t    /* struct for factors of relations */
+typedef struct          /* struct for factors of relations */
 {
    slong ind;
    slong exp;
 } fac_t;
 
-typedef struct la_col_t  /* matrix column */
+typedef struct           /* matrix column */
 {
    slong * data;		/* The list of occupied rows in this column */
    slong weight;		/* Number of nonzero entries in this column */
@@ -57,14 +48,14 @@ typedef struct la_col_t  /* matrix column */
 } la_col_t;
 
 
-typedef struct hash_t   /* entry in hash table */
+typedef struct          /* entry in hash table */
 {
    mp_limb_t prime;    /* value of prime */
    mp_limb_t next;     /* next prime which have same hash value as 'prime' */
    mp_limb_t count;    /* number of occurrence of 'prime' */
 } hash_t;
 
-typedef struct relation_t  /* format for relation */
+typedef struct             /* format for relation */
 {
    mp_limb_t lp;          /* large prime, is 1, if relation is full */
    slong num_factors;     /* number of factors, excluding small factor */
@@ -74,7 +65,7 @@ typedef struct relation_t  /* format for relation */
    fmpz_t Y;              /* square root of sieve value for relation */
 } relation_t;
 
-typedef struct qs_poly_s
+typedef struct
 {
    fmpz_t B;          /* current B coeff of poly */
    int * soln1;       /* first start position in sieve per prime */
@@ -88,7 +79,7 @@ typedef struct qs_poly_s
 
 typedef qs_poly_s qs_poly_t[1];
 
-typedef struct qs_s
+typedef struct
 {
    volatile slong index_j;
 #if FLINT_USES_PTHREAD
@@ -176,7 +167,7 @@ typedef struct qs_s
                        RELATION DATA
    ***************************************************************************/
 
-   FILE * siqs;           /* pointer to file for storing relations */
+   FLINT_FILE * siqs;           /* pointer to file for storing relations */
    char * fname;          /* name of file used for relations */
 
    slong full_relation;   /* number of full relations */
@@ -298,7 +289,7 @@ static const mp_limb_t qsieve_tune[][6] =
    {270, 800, 35000, 27,   28 *  65536, 102}, /* 82 digits */
    {280, 900, 40000, 29,   28 *  65536, 104}, /* 85 digits */
    {290, 1000, 60000, 29,  32 *  65536, 106}, /* 88 digits */
-   {300, 1100, 140000, 30,  32 * 65536, 108} /* 91 digits */ 
+   {300, 1100, 140000, 30,  32 * 65536, 108} /* 91 digits */
 };
 
 #endif
@@ -306,78 +297,78 @@ static const mp_limb_t qsieve_tune[][6] =
 /* number of entries in the tuning table */
 #define QS_TUNE_SIZE (sizeof(qsieve_tune)/(6*sizeof(mp_limb_t)))
 
-FLINT_DLL void qsieve_init(qs_t qs_inf, const fmpz_t n);
+void qsieve_init(qs_t qs_inf, const fmpz_t n);
 
-FLINT_DLL mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf);
+mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf);
 
-FLINT_DLL void qsieve_clear(qs_t qs_inf);
+void qsieve_clear(qs_t qs_inf);
 
-FLINT_DLL void qsieve_factor(fmpz_factor_t factors, const fmpz_t n);
+void qsieve_factor(fmpz_factor_t factors, const fmpz_t n);
 
-FLINT_DLL prime_t * compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf,
+prime_t * compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf,
                                                              slong num_primes);
 
-FLINT_DLL mp_limb_t qsieve_primes_init(qs_t qs_inf);
+mp_limb_t qsieve_primes_init(qs_t qs_inf);
 
-FLINT_DLL mp_limb_t qsieve_primes_increment(qs_t qs_inf, mp_limb_t delta);
+mp_limb_t qsieve_primes_increment(qs_t qs_inf, mp_limb_t delta);
 
-FLINT_DLL mp_limb_t qsieve_poly_init(qs_t qs_inf);
+mp_limb_t qsieve_poly_init(qs_t qs_inf);
 
-FLINT_DLL int qsieve_init_A(qs_t qs_inf);
+int qsieve_init_A(qs_t qs_inf);
 
-FLINT_DLL void qsieve_reinit_A(qs_t qs_inf);
+void qsieve_reinit_A(qs_t qs_inf);
 
-FLINT_DLL int qsieve_next_A(qs_t qs_inf);
+int qsieve_next_A(qs_t qs_inf);
 
-FLINT_DLL void qsieve_init_poly_first(qs_t qs_inf);
+void qsieve_init_poly_first(qs_t qs_inf);
 
-FLINT_DLL void qsieve_init_poly_next(qs_t qs_inf, slong i);
+void qsieve_init_poly_next(qs_t qs_inf, slong i);
 
-FLINT_DLL void qsieve_compute_C(fmpz_t C, qs_t qs_inf, qs_poly_t poly);
+void qsieve_compute_C(fmpz_t C, qs_t qs_inf, qs_poly_t poly);
 
-FLINT_DLL void qsieve_poly_copy(qs_poly_t poly, qs_t qs_inf);
+void qsieve_poly_copy(qs_poly_t poly, qs_t qs_inf);
 
-FLINT_DLL void qsieve_poly_clear(qs_t qs_inf);
+void qsieve_poly_clear(qs_t qs_inf);
 
-FLINT_DLL void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly);
+void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly);
 
-FLINT_DLL void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly);
+void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly);
 
-FLINT_DLL slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_poly_t poly);
+slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_poly_t poly);
 
-FLINT_DLL slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly);
+slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly);
 
-FLINT_DLL slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve);
+slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve);
 
-FLINT_DLL void qsieve_linalg_init(qs_t qs_inf);
+void qsieve_linalg_init(qs_t qs_inf);
 
-FLINT_DLL void qsieve_linalg_realloc(qs_t qs_inf);
+void qsieve_linalg_realloc(qs_t qs_inf);
 
-FLINT_DLL void qsieve_linalg_clear(qs_t qs_inf);
+void qsieve_linalg_clear(qs_t qs_inf);
 
-FLINT_DLL int qsieve_relations_cmp(const void * a, const void * b);
+int qsieve_relations_cmp(const void * a, const void * b);
 
-FLINT_DLL slong qsieve_merge_relations(qs_t qs_inf);
+slong qsieve_merge_relations(qs_t qs_inf);
 
-FLINT_DLL void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime,
+void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime,
                                                      fmpz_t Y, qs_poly_t poly);
 
-FLINT_DLL hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime);
+hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime);
 
-FLINT_DLL void qsieve_add_to_hashtable(qs_t qs_inf, mp_limb_t prime);
+void qsieve_add_to_hashtable(qs_t qs_inf, mp_limb_t prime);
 
-FLINT_DLL relation_t qsieve_parse_relation(qs_t qs_inf, char * str);
+relation_t qsieve_parse_relation(qs_t qs_inf, char * str);
 
-FLINT_DLL relation_t qsieve_merge_relation(qs_t qs_inf, relation_t  a, relation_t  b);
+relation_t qsieve_merge_relation(qs_t qs_inf, relation_t  a, relation_t  b);
 
-FLINT_DLL int qsieve_compare_relation(const void * a, const void * b);
+int qsieve_compare_relation(const void * a, const void * b);
 
-FLINT_DLL int qsieve_remove_duplicates(relation_t * rel_list, slong num_relations);
+int qsieve_remove_duplicates(relation_t * rel_list, slong num_relations);
 
-FLINT_DLL void qsieve_insert_relation(qs_t qs_inf, relation_t * rel_list,
+void qsieve_insert_relation(qs_t qs_inf, relation_t * rel_list,
                                                           slong num_relations);
 
-FLINT_DLL int qsieve_process_relation(qs_t qs_inf);
+int qsieve_process_relation(qs_t qs_inf);
 
 static __inline__ void insert_col_entry(la_col_t * col, slong entry)
 {
@@ -419,14 +410,14 @@ static __inline__ void free_col(la_col_t * col)
    if (col->weight) flint_free(col->data);
 }
 
-FLINT_DLL uint64_t get_null_entry(uint64_t * nullrows, slong i, slong l);
+uint64_t get_null_entry(uint64_t * nullrows, slong i, slong l);
 
-FLINT_DLL void reduce_matrix(qs_t qs_inf, slong *nrows, slong *ncols, la_col_t *cols);
+void reduce_matrix(qs_t qs_inf, slong *nrows, slong *ncols, la_col_t *cols);
 
-FLINT_DLL uint64_t * block_lanczos(flint_rand_t state, slong nrows,
+uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 			slong dense_rows, slong ncols, la_col_t *B);
 
-FLINT_DLL void qsieve_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,
+void qsieve_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,
    uint64_t * nullrows, slong ncols, slong l, fmpz_t N);
 
 #ifdef __cplusplus

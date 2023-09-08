@@ -15,8 +15,7 @@ File: dir,	Node: Top	This is the top of the INFO tree
 * Menu:
 
 GNU libraries
-* mpir: (mpir).                 MPIR Multiple Precision Integers and Rationals 
-                                  Library.
+* gmp: (gmp).                   GNU Multiple Precision Arithmetic Library.
 
 Software libraries
 * mpfr: (mpfr).                 Multiple Precision Floating-Point Reliable 

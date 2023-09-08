@@ -15,15 +15,14 @@
 #define FQ_ZECH_POLY_H
 
 #ifdef FQ_ZECH_POLY_INLINES_C
-#define FQ_ZECH_POLY_INLINE FLINT_DLL
-#define FQ_POLY_TEMPLATES_INLINE FLINT_DLL
+#define FQ_ZECH_POLY_INLINE
+#define FQ_POLY_TEMPLATES_INLINE
 #else
 #define FQ_ZECH_POLY_INLINE static __inline__
 #define FQ_POLY_TEMPLATES_INLINE static __inline__
 #endif
 
-#include "fq_zech_mat.h"
-#include "fmpz_mod_poly.h"
+#include "fq_zech_types.h"
 
 #define FQ_ZECH_POLY_DIVREM_DIVCONQUER_CUTOFF  16
 #define FQ_ZECH_COMPOSE_MOD_LENH_CUTOFF 6
@@ -45,7 +44,5 @@
 #include "fq_poly_templates.h"
 #undef CAP_T
 #undef T
-
-#include "fq_zech_poly_factor.h"
 
 #endif

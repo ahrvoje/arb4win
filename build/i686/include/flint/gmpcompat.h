@@ -9,13 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include <limits.h>
-
 #ifndef GMP_COMPAT_H
 #define GMP_COMPAT_H
+
+#include "flint.h"
 
 #define FLINT_MPZ_REALLOC(z, len)       \
     ((len) > ((z)->_mp_alloc)           \
@@ -28,6 +25,67 @@
     (a) = (b);                      \
     (b) = __tmp;                    \
   } while (0)
+
+static __inline__
+void flint_mpz_add_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)
+{
+    ulong d[2];
+    mpz_t c;
+    d[0] = c0;
+    d[1] = c1;
+    c->_mp_d = d;
+    c->_mp_alloc = 2;
+    c->_mp_size = d[1] != 0 ? 2 : d[0] != 0;
+    mpz_add(a, b, c);
+}
+
+static __inline__
+void flint_mpz_add_signed_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)
+{
+    ulong d[2];
+    ulong c2 = FLINT_SIGN_EXT(c1);
+    mpz_t c;
+    sub_ddmmss(d[1], d[0], c2^c1, c2^c0, c2, c2);
+    c->_mp_d = d;
+    c->_mp_alloc = 2;
+    c->_mp_size = d[1] != 0 ? 2 : d[0] != 0;
+    if (c2 != 0)
+        c->_mp_size = -c->_mp_size;
+    mpz_add(a, b, c);
+}
+
+static __inline__
+void flint_mpz_add_uiuiui(mpz_ptr a, mpz_srcptr b, ulong c2, ulong c1, ulong c0)
+{
+    ulong d[3];
+    mpz_t c;
+    d[0] = c0;
+    d[1] = c1;
+    d[2] = c2;
+    c->_mp_d = d;
+    c->_mp_alloc = 3;
+    c->_mp_size = d[2] != 0 ? 3 : d[1] != 0 ? 2 : d[0] != 0;
+    mpz_add(a, b, c);
+}
+
+static __inline__
+void flint_mpz_add_signed_uiuiui(mpz_ptr a, mpz_srcptr b,
+                                                 ulong c2, ulong c1, ulong c0)
+{
+    ulong cs, d[3];
+    mpz_t c;
+    c->_mp_d = d;
+    c->_mp_alloc = 3;
+    cs = FLINT_SIGN_EXT(c2);
+    sub_dddmmmsss(d[2], d[1], d[0], cs^c2, cs^c1, cs^c0, cs, cs, cs);
+    c->_mp_size = d[2] != 0 ? 3 :
+                  d[1] != 0 ? 2 :
+                  d[0] != 0;
+    if (cs != 0)
+        c->_mp_size = -c->_mp_size;
+    mpz_add(a, b, c);
+}
+
 
 /* mpn_get_d -- limbs to double conversion.
 
@@ -179,7 +237,7 @@ double flint_mpn_get_d (mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp)
 
       m0 = ptr[size-1];			    /* high limb */
       m1 = (size >= 2 ? ptr[size-2] : 0);   /* second highest limb */
-      count_leading_zeros (lshift, m0);
+      lshift = flint_clz(m0);
 
       /* relative to just under high non-zero bit */
       exp -= lshift + 1;
@@ -318,7 +376,7 @@ void flint_mpz_set_ui(mpz_ptr r, ulong u)
       r->_mp_alloc = 1;
    }
 
-   r->_mp_d[0] = u; 
+   r->_mp_d[0] = u;
    r->_mp_size = u != 0;
 }
 
@@ -343,7 +401,7 @@ void flint_mpz_init_set_ui(mpz_ptr r, ulong u)
    r->_mp_d = (mp_ptr) flint_malloc(sizeof(mp_limb_t));
    r->_mp_alloc = 1;
 
-   r->_mp_d[0] = u; 
+   r->_mp_d[0] = u;
    r->_mp_size = u != 0;
 }
 
@@ -351,7 +409,7 @@ static __inline__
 void flint_mpz_add_ui(mpz_ptr a, mpz_srcptr b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
-   
+
    mpz_add(a, b, tc);
 }
 
@@ -359,7 +417,7 @@ static __inline__
 void flint_mpz_sub_ui(mpz_ptr a, mpz_srcptr b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
-   
+
    mpz_sub(a, b, tc);
 }
 
@@ -367,7 +425,7 @@ static __inline__
 void flint_mpz_mul_ui(mpz_ptr a, mpz_srcptr b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
-   
+
    mpz_mul(a, b, tc);
 }
 
@@ -375,7 +433,7 @@ static __inline__
 void flint_mpz_mul_si(mpz_ptr a, mpz_srcptr b, slong c)
 {
    FLINT_MOCK_MPZ_SI(tc, c);
-   
+
    mpz_mul(a, b, tc);
 }
 
@@ -383,7 +441,7 @@ static __inline__
 void flint_mpz_addmul_ui(mpz_ptr a, mpz_srcptr b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
-   
+
    mpz_addmul(a, b, tc);
 }
 
@@ -391,7 +449,7 @@ static __inline__
 void flint_mpz_submul_ui(mpz_ptr a, mpz_srcptr b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
-   
+
    mpz_submul(a, b, tc);
 }
 
@@ -399,7 +457,7 @@ static __inline__
 void flint_mpz_ui_sub(mpz_ptr a, ulong b, mpz_srcptr c)
 {
    FLINT_MOCK_MPZ_UI(tb, b);
-   
+
    mpz_sub(a, tb, c);
 }
 
@@ -407,7 +465,7 @@ static __inline__
 void flint_mpz_ui_pow_ui(mpz_ptr a, ulong b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tb, b);
-   
+
    mpz_pow_ui(a, tb, c);
 }
 
@@ -415,7 +473,7 @@ static __inline__
 void flint_mpz_divexact_ui(mpz_ptr a, mpz_srcptr b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
-   
+
    mpz_divexact(a, b, tc);
 }
 
@@ -423,7 +481,7 @@ static __inline__
 int flint_mpz_divisible_ui_p(mpz_srcptr a, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
-   
+
    return mpz_divisible_p(a, tc);
 }
 
@@ -433,7 +491,7 @@ int flint_mpz_congruent_ui_p(mpz_srcptr a, ulong b, ulong c)
    FLINT_MOCK_MPZ_UI(tc, c);
    {
       FLINT_MOCK_MPZ_UI(tb, b);
-   
+
       return mpz_congruent_p(a, tb, tc);
    }
 }
@@ -442,7 +500,7 @@ static __inline__
 int flint_mpz_cmp_ui(mpz_srcptr a, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
-   
+
    return mpz_cmp(a, tc);
 }
 
@@ -450,7 +508,7 @@ static __inline__
 int flint_mpz_cmp_si(mpz_srcptr a, slong c)
 {
    FLINT_MOCK_MPZ_SI(tc, c);
-   
+
    return mpz_cmp(a, tc);
 }
 
@@ -529,7 +587,7 @@ ulong flint_mpz_cdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
       mpz_t rz;
 
       mpz_init(rz);
-      
+
       FLINT_MOCK_MPZ_UI(tc, c);
 
       mpz_cdiv_qr(q, rz, n, tc);
@@ -540,7 +598,7 @@ ulong flint_mpz_cdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
 
       return r;
    }
-}    
+}
 
 static __inline__
 ulong flint_mpz_fdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
@@ -553,7 +611,7 @@ ulong flint_mpz_fdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
       mpz_t rz;
 
       mpz_init(rz);
-      
+
       FLINT_MOCK_MPZ_UI(tc, c);
 
       mpz_fdiv_qr(q, rz, n, tc);
@@ -577,7 +635,7 @@ ulong flint_mpz_tdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
       mpz_t rz;
 
       mpz_init(rz);
-      
+
       FLINT_MOCK_MPZ_UI(tc, c);
 
       mpz_tdiv_qr(q, rz, n, tc);
@@ -726,10 +784,10 @@ static __inline__
 void flint_mpz_pow_ui(mpz_ptr r, mpz_srcptr b, ulong exp)
 {
    if (exp >= (UWORD(1) << 32)) {
-      printf("Exception (flint_mpz_pow_ui). Power too large.\n");
+      flint_printf("Exception (flint_mpz_pow_ui). Power too large.\n");
       flint_abort();
    }
-   
+
    mpz_pow_ui(r, b, (unsigned long) exp);
 }
 
@@ -737,10 +795,10 @@ static __inline__
 void flint_mpz_fac_ui(mpz_ptr r, ulong n)
 {
    if (n >= (UWORD(1) << 32)) {
-      printf("Exception (flint_mpz_fac_ui). Value n too large.\n");
+      flint_printf("Exception (flint_mpz_fac_ui). Value n too large.\n");
       flint_abort();
    }
-   
+
    mpz_fac_ui(r, (unsigned long) n);
 }
 
@@ -748,15 +806,15 @@ static __inline__
 void flint_mpz_bin_uiui(mpz_ptr r, ulong n, ulong k)
 {
    if (n >= (UWORD(1) << 32)) {
-      printf("Exception (flint_mpz_bin_uiui). Value n too large.\n");
+      flint_printf("Exception (flint_mpz_bin_uiui). Value n too large.\n");
       flint_abort();
    }
-   
+
    if (k >= (UWORD(1) << 32)) {
-      printf("Exception (flint_mpz_bin_uiui). Value k too large.\n");
+      flint_printf("Exception (flint_mpz_bin_uiui). Value k too large.\n");
       flint_abort();
    }
-   
+
    mpz_bin_uiui(r, (unsigned long) n, (unsigned long) k);
 }
 
@@ -764,10 +822,10 @@ static __inline__
 void flint_mpz_fib_ui(mpz_ptr r, ulong n)
 {
    if (n >= (UWORD(1) << 32)) {
-      printf("Exception (flint_mpz_fib_ui). Value n too large.\n");
+      flint_printf("Exception (flint_mpz_fib_ui). Value n too large.\n");
       flint_abort();
    }
-   
+
    mpz_fib_ui(r, (unsigned long) n);
 }
 
@@ -933,7 +991,7 @@ int flint_mpf_cmp_ui(mpf_srcptr u, ulong vval)
 
   if (usize < 0)
     return -1;
-  
+
   if (vval == 0)
     return usize != 0;
 
@@ -1115,7 +1173,7 @@ double flint_mpf_get_d_2exp(slong * exp2, mpf_srcptr src)
 
   ptr = src->_mp_d;
   abs_size = FLINT_ABS(size);
-  count_leading_zeros (cnt, ptr[abs_size - 1]);
+  cnt = flint_clz(ptr[abs_size - 1]);
 
   exp = src->_mp_exp * FLINT_BITS - cnt;
   *exp2 = exp;

@@ -14,8 +14,6 @@
 
 #include "flint.h"
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
 #include <time.h>
 #if defined( _MSC_VER )
 #include <intrin.h>
@@ -26,35 +24,33 @@
 #endif
 #if defined (__WIN32) && !defined(__CYGWIN__)
 #ifdef __cplusplus
-FLINT_DLL void  GetSystemTimeAsFileTime(FILETIME*);
+void  GetSystemTimeAsFileTime(FILETIME*);
 
 static __inline__ int gettimeofday(struct timeval * p, void * tz)
 {
    union {
-      slong slong ns100; 
+      slong slong ns100;
       FILETIME ft;
    } now;
 
     GetSystemTimeAsFileTime(&(now.ft));
     p->tv_usec=(slong)((now.ns100 / WORD(10)L) % WORD(1000000)L );
     p->tv_sec= (slong)((now.ns100-(WORD(116444736000000000)L))/WORD(10000000)L);
-	
+
     return 0;
 }
 #else
-FLINT_DLL int gettimeofday(struct timeval * p, void * tz);
+int gettimeofday(struct timeval * p, void * tz);
 #endif
 #elif !defined(_MSC_VER)
 #include <sys/resource.h>
 #endif
-#undef ulong
-#define ulong mp_limb_t
 
 #ifdef __cplusplus
  extern "C" {
 #endif
 
-typedef struct  
+typedef struct
 {
     ulong size;
     ulong peak;
@@ -62,7 +58,7 @@ typedef struct
     ulong rss;
 } meminfo_t[1];
 
-FLINT_DLL void get_memory_usage(meminfo_t meminfo);
+void get_memory_usage(meminfo_t meminfo);
 
 typedef struct
 {
@@ -96,10 +92,28 @@ void timeit_stop(timeit_t t)
     t->cpu += clock() * 1000 / CLOCKS_PER_SEC;
 }
 
+static __inline__
+void timeit_start_us(timeit_t t)
+{
+    struct timeval tv;
+    gettimeofday(&tv, 0);
+    t->wall = - tv.tv_sec * 1000000 - tv.tv_usec;
+}
+
+
+static __inline__
+void timeit_stop_us(timeit_t t)
+{
+    struct timeval tv;
+    gettimeofday(&tv, 0);
+    t->wall += tv.tv_sec * 1000000 + tv.tv_usec;
+}
+
+
 /******************************************************************************
 
     Timer based on the x86 cycle counter
-   
+
 ******************************************************************************/
 
 #if (defined( _MSC_VER ) || (GMP_LIMB_BITS == 64 && defined (__amd64__)) || \
@@ -110,10 +124,10 @@ void timeit_stop(timeit_t t)
 
 #define FLINT_CLOCKSPEED 3100000000.0
 
-extern double clock_last[FLINT_NUM_CLOCKS];
-extern double clock_accum[FLINT_NUM_CLOCKS];
+FLINT_DLL extern double clock_last[FLINT_NUM_CLOCKS];
+FLINT_DLL extern double clock_accum[FLINT_NUM_CLOCKS];
 
-static __inline__ 
+static __inline__
 double get_cycle_counter()
 {
 #if defined( _MSC_VER )
@@ -122,9 +136,9 @@ double get_cycle_counter()
     unsigned int hi;
    unsigned int lo;
 
-   __asm("rdtsc; movl %%edx,%0; movl %%eax,%1" 
+   __asm("rdtsc; movl %%edx,%0; movl %%eax,%1"
        : "=r" (hi), "=r" (lo)
-       : 
+       :
        : "%edx", "%eax");
 
    return (double) hi * (1 << 30) * 4 + lo;
@@ -133,13 +147,13 @@ double get_cycle_counter()
 
 #define FLINT_CLOCK_SCALE_FACTOR (1000000.0 / FLINT_CLOCKSPEED)
 
-static __inline__ 
+static __inline__
 void init_clock(int n)
 {
    clock_accum[n] = 0.0;
 }
 
-static __inline__ 
+static __inline__
 void init_all_clocks()
 {
    int i;
@@ -153,13 +167,13 @@ double get_clock(int n)
    return clock_accum[n] * FLINT_CLOCK_SCALE_FACTOR;
 }
 
-static __inline__ 
+static __inline__
 void start_clock(int n)
 {
    clock_last[n] = get_cycle_counter();
 }
 
-static __inline__ 
+static __inline__
 void stop_clock(int n)
 {
    double now = get_cycle_counter();
@@ -172,13 +186,13 @@ void stop_clock(int n)
 
 ******************************************************************************/
 
-static __inline__ 
+static __inline__
 void prof_start()
 {
    start_clock(0);
 }
 
-static __inline__ 
+static __inline__
 void prof_stop()
 {
    stop_clock(0);
@@ -186,7 +200,7 @@ void prof_stop()
 
 typedef void (*profile_target_t)(void* arg, ulong count);
 
-FLINT_DLL void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
+void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
 
 #define DURATION_THRESHOLD 5000.0
 
@@ -232,6 +246,12 @@ FLINT_DLL void prof_repeat(double* min, double* max, profile_target_t target, vo
 #define TIMEIT_STOP \
         TIMEIT_END_REPEAT(__timer, __reps) \
         TIMEIT_PRINT(__timer, __reps) \
+    } while (0);
+
+#define TIMEIT_STOP_VALUES(tcpu, twall) \
+        TIMEIT_END_REPEAT(__timer, __reps) \
+        (tcpu) = __timer->cpu*0.001 / __reps; \
+        (twall) = __timer->wall*0.001 / __reps; \
     } while (0);
 
 #define TIMEIT_ONCE_START \
