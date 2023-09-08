@@ -99,7 +99,7 @@ int main()
 ```
 32-bit demo is compiled using **build_arb_demo_32.sh** or via the following command line in MSYS2 mingw32 environment.
 ```
-$ gcc -Ibuild/i686/include arb_demo.c -obuild/i686/bin/static_demo.exe -Lbuild/i686/lib -larb -lflint -lmpfr -lgmp
+$ gcc -Ibuild/i686/include -Ibuild/i686/include/flint arb_demo.c -obuild/i686/bin/static_demo.exe -Lbuild/i686/lib -lflint -lmpfr -lgmp
 ```
 ```
 $ ./build/i686/bin/static_demo.exe
