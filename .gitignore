@@ -1,2 +1,4 @@
-
+build/i686/bin/static_demo.exe
 build/i686/bin/shared_demo.exe
+build/x86_64/bin/static_demo.exe
+build/x86_64/bin/shared_demo.exe
