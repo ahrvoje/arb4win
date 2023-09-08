@@ -8,11 +8,11 @@
 #             03.04.2017
 #             10.02.2020 - use MSYS2 mingw, not Qt
 #             05.12.2021 - 64bit, MPIR replace GMP, join static&shared MPFR build, auto ABI, check config & make error
-#             06.09.2023 - MPIR removed, check for gcc & m4 & make & autoreconf utils, Arb merged into Flint 3.0.0 so no longer built separately
+#             06.09.2023 - MPIR removed, check for gcc;m4;make;autoreconf utils and MINGW env, Arb merged into Flint 3.0.0 so no longer built separately
 #
 #  Configuration used at the latest revision:
 #    Windows 11 64-bit
-#    msys2-x86_64-20210725
+#    msys2-x86_64-20230718
 #      - update MSYS2     : pacman -Syu
 #      - update MSYS2     : pacman -Su
 #      - install devel    : pacman -S base-devel
@@ -23,7 +23,8 @@
 #      - install make     : pacman -S make
 #      - install autotools: pacman -S autotools           # contains autoreconf for Flint 3.0.0 bootstrap
 
-[[ $(uname -o) == Msys ]] || { echo "MSYS environment required. Exiting..."; exit 1; }
+[[ $(uname -o) == Msys   ]] || { echo "MSYS platform required. Exiting..."; exit 1; }
+[[ $(uname)    == MINGW* ]] || { echo "MINGW environment required. Exiting..."; exit 1; }
 
 [[ $(command -v gcc)        ]] || { echo "GCC not found, consider installing a corresponding mingw compiler. Exiting..."; exit 1; }
 [[ $(command -v yasm)       ]] || { echo "yasm not found, consider installing it. Exiting..."; exit 1; }
@@ -31,8 +32,8 @@
 [[ $(command -v make)       ]] || { echo "make not found, consider installing it. Exiting..."; exit 1; }
 [[ $(command -v autoreconf) ]] || { echo "autoreconf not found, consider installing autotools. Exiting..."; exit 1; }
 
-[[ $(uname)    == MINGW32* ]] && { ABI=32; TARGET=/opt/i686; }
-[[ $(uname)    == MINGW64* ]] && { ABI=64; TARGET=/opt/x86_64; }
+[[ $(uname) == MINGW32* ]] && { ABI=32; TARGET=/opt/i686; }
+[[ $(uname) == MINGW64* ]] && { ABI=64; TARGET=/opt/x86_64; }
 
 # modify if needed
 SOURCE=/opt/src
