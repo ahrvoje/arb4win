@@ -24,7 +24,7 @@ Cygwin isn't used as it does not handle symbolic links used by some **configure*
 ## Workflow
 
 1. Install MSYS2, update it, and install **base-devel**, **mingw-w64-i686-gcc**, **mingw-w64-x86_64-gcc**, **yasm**
-2. Extract GMP, MPFR, FLINT & ARB src into MSYS2 **_/opt/src_** folder.
+2. Extract GMP, MPFR & FLINT src into MSYS2 **_/opt/src_** folder.
 3. Check and adapt `SOURCE` variable in **_build_ARB.sh_**, i.e. `SOURCE=/opt/src`.
 4. Finally, after starting MSYS2 **mingw32.exe** shell for 32-bit or **mingw64.exe** shell for 64-bit build, execute the following command and the build process will start:
 ```
@@ -102,13 +102,13 @@ int main()
 $ gcc -Ibuild/i686/include arb_demo.c -obuild/i686/bin/static_demo.exe -Lbuild/i686/lib -larb -lflint -lmpfr -lgmp
 ```
 ```
-$ ./static_demo.exe
-Computed with 32-bit Arb 2.21.1
+$ ./build/i686/bin/static_demo.exe
+Computed with 32-bit Arb 2.23.0
 a   = 1.0000000000000000000000132348898008484427979425390731 +/- 0
-b   = 75557863725914323419136.5 +/- 0
-x   = 2.718281828459045235360287471352662497757247093739638 +/- 1.1407e-300
+b   = 75557863725914323419136.500000000000000000000000000000 +/- 0
+x   = 2.7182818284590452353602874713526624977572470937396380 +/- 1.1407e-300
 e   = 2.7182818284590452353602874713526624977572470936999596 +/- 3.7331e-301
-x-e = 3.9678376581476207465438603498757884997818078351607135e-47 +/- 1.514e-300
+x-e = 3.9678376581476207465438603498757884997818078351607135e-47 +/- 1.5140e-300
 ```
 
 ### Shared (dynamic) for Windows
