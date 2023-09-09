@@ -23,12 +23,12 @@ Cygwin isn't used as it does not handle symbolic links used by some **configure*
 
 ## Workflow
 
-1. Install MSYS2, update it, and install **base-devel**, **mingw-w64-i686-gcc**, **mingw-w64-x86_64-gcc**, **yasm**
+1. Install MSYS2, update it, and install **base-devel**, i686 & x86_64 **mingw**, **yasm**, **m4**, **make**, **autotools**
 2. Extract GMP, MPFR & FLINT src into MSYS2 **_/opt/src_** folder.
-3. Check and adapt `SOURCE` variable in **_build_ARB.sh_**, i.e. `SOURCE=/opt/src`.
+3. Check and adapt `GMP`, `MPFR` & `FLINT` source variables in **_build_ARB.sh_**, e.g. `GMP=$SOURCE/gmp-6.3.0`.
 4. Finally, after starting MSYS2 **mingw32.exe** shell for 32-bit or **mingw64.exe** shell for 64-bit build, execute the following command and the build process will start:
 ```
-$ build_ARB.sh
+$ ./build_ARB.sh
 ```
 **_build_ARB.sh_** automatically executes the entire workflow with timing & log files written to MSYS2 **_/var/log_** folder.
 
