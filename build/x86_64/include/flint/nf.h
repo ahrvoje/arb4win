@@ -1,39 +1,23 @@
-/*=============================================================================
-
-    This file is part of Antic.
-
-    Antic is free software: you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version. See <http://www.gnu.org/licenses/>.
-
-=============================================================================*/
-/******************************************************************************
-
+/*
     Copyright (C) 2013 William Hart
 
-******************************************************************************/
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+*/
 
 #ifndef NF_H
 #define NF_H
 
-#include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
-
-/* antic version number */
-
-#define __ANTIC_VERSION 0
-#define __ANTIC_VERSION_MINOR 2
-#define __ANTIC_VERSION_PATCHLEVEL 4
-#define ANTIC_VERSION "0.2.4"
-#define __ANTIC_RELEASE (__ANTIC_VERSION * 10000 + \
-                         __ANTIC_VERSION_MINOR * 100 + \
-                         __ANTIC_VERSION_PATCHLEVEL)
 
 typedef struct {
    fmpq_poly_t pol;  /* defining polynomial */
@@ -67,7 +51,7 @@ typedef nf_struct nf_t[1];
 
 void nf_init(nf_t nf, const fmpq_poly_t pol);
 
-void nf_init_randtest(nf_t nf, flint_rand_t state, slong len,  mp_bitcnt_t bits_in);
+void nf_init_randtest(nf_t nf, flint_rand_t state, slong len,  flint_bitcnt_t bits_in);
 
 void nf_clear(nf_t nf);
 

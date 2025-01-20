@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2021 Fredrik Johansson
 
-    This file is part of Calcium.
+    This file is part of FLINT.
 
-    Calcium is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef FEXPR_H
@@ -15,15 +15,24 @@
 #ifdef FEXPR_INLINES_C
 #define FEXPR_INLINE
 #else
-#define FEXPR_INLINE static __inline__
+#define FEXPR_INLINE static inline
 #endif
+
+#include "mpoly_types.h"
+#include "arf_types.h"
+#include "gr_types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "mpoly_types.h"
-#include "calcium.h"
+/* FIXME: We need calcium_stream in ca_types.h, but this header includes qqbar.h
+   which conditionally defines functions using fexpr_t if and only if FEXPR_H is
+   defined. And at this point FEXPR_H is defined, but not fexpr_t... */
+#ifndef calcium_stream_struct
+# define calcium_stream_struct gr_stream_struct
+# define calcium_stream_t gr_stream_t
+#endif
 
 #define FEXPR_TYPE_SMALL_INT     UWORD(0)
 #define FEXPR_TYPE_SMALL_SYMBOL  UWORD(1)
@@ -79,7 +88,7 @@ typedef fexpr_vec_struct fexpr_vec_t[1];
 FEXPR_INLINE void
 fexpr_init(fexpr_t expr)
 {
-    expr->data = flint_malloc(sizeof(ulong));
+    expr->data = (ulong *) flint_malloc(sizeof(ulong));
     expr->data[0] = 0;
     expr->alloc = 1;
 }
@@ -94,7 +103,7 @@ FEXPR_INLINE fexpr_ptr
 _fexpr_vec_init(slong len)
 {
     slong i;
-    fexpr_ptr vec = flint_malloc(sizeof(fexpr_struct) * len);
+    fexpr_ptr vec = (fexpr_ptr) flint_malloc(sizeof(fexpr_struct) * len);
     for (i = 0; i < len; i++)
         fexpr_init(vec + i);
     return vec;
@@ -115,7 +124,7 @@ fexpr_fit_size(fexpr_t expr, slong size)
     if (expr->alloc < size)
     {
         size = FLINT_MAX(size, 2 * expr->alloc);
-        expr->data = flint_realloc(expr->data, size * sizeof(ulong));
+        expr->data = (ulong *) flint_realloc(expr->data, size * sizeof(ulong));
         expr->alloc = size;
     }
 }
@@ -138,38 +147,25 @@ fexpr_set(fexpr_t res, const fexpr_t expr)
 {
     if (res != expr)
     {
+        slong i;
         slong size = fexpr_size(expr);
         fexpr_fit_size(res, size);
-        flint_mpn_copyi(res->data, expr->data, size);
+        for (i = 0; i < size; i++)
+            res->data[i] = expr->data[i];
     }
 }
 
 FEXPR_INLINE void
 fexpr_swap(fexpr_t a, fexpr_t b)
 {
-    fexpr_struct tmp = *a;
-    *a = *b;
-    *b = tmp;
-}
-
-
-FEXPR_INLINE int
-_mpn_equal(mp_srcptr a, mp_srcptr b, slong len)
-{
-    slong i;
-
-    for (i = 0; i < len; i++)
-        if (a[i] != b[i])
-            return 0;
-
-    return 1;
+    FLINT_SWAP(fexpr_struct, *a, *b);
 }
 
 FEXPR_INLINE int
 fexpr_equal(const fexpr_t a, const fexpr_t b)
 {
     ulong ha, hb;
-    slong sa, sb;
+    slong i, sa, sb;
 
     ha = a->data[0];
     hb = b->data[0];
@@ -183,7 +179,11 @@ fexpr_equal(const fexpr_t a, const fexpr_t b)
     if (sa != sb)
         return 0;
 
-    return _mpn_equal(a->data + 1, b->data + 1, sa - 1);
+    for (i = 1; i < sa; i++)
+        if (a->data[i] != b->data[i])
+            return 0;
+
+    return 1;
 }
 
 /* todo: document, test */
@@ -456,7 +456,7 @@ fexpr_vec_init(fexpr_vec_t vec, slong len)
     else
     {
         slong i;
-        vec->entries = flint_malloc(sizeof(fexpr_struct) * len);
+        vec->entries = (fexpr_ptr) flint_malloc(sizeof(fexpr_struct) * len);
         for (i = 0; i < len; i++)
             fexpr_init(vec->entries + i);
         vec->length = vec->alloc = len;
@@ -497,7 +497,7 @@ fexpr_vec_fit_length(fexpr_vec_t vec, slong len)
         if (len < 2 * vec->alloc)
             len = 2 * vec->alloc;
 
-        vec->entries = flint_realloc(vec->entries, len * sizeof(fexpr_struct));
+        vec->entries = (fexpr_struct *) flint_realloc(vec->entries, len * sizeof(fexpr_struct));
 
         for (i = vec->alloc; i < len; i++)
             fexpr_init(vec->entries + i);
@@ -582,4 +582,3 @@ fexpr_vec_set_length(fexpr_vec_t vec, slong len)
 #endif
 
 #endif
-

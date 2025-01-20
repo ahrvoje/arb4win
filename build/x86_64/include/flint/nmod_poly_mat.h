@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,10 +15,10 @@
 #ifdef NMOD_POLY_MAT_INLINES_C
 #define NMOD_POLY_MAT_INLINE
 #else
-#define NMOD_POLY_MAT_INLINE static __inline__
+#define NMOD_POLY_MAT_INLINE static inline
 #endif
 
-#include "nmod_poly.h"
+#include "nmod_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,11 +44,15 @@ nmod_poly_mat_ncols(const nmod_poly_mat_t mat)
 
 /* Memory management *********************************************************/
 
-void nmod_poly_mat_init(nmod_poly_mat_t mat, slong rows, slong cols, mp_limb_t n);
+void nmod_poly_mat_init(nmod_poly_mat_t mat, slong rows, slong cols, ulong n);
 
 void nmod_poly_mat_init_set(nmod_poly_mat_t mat, const nmod_poly_mat_t src);
 
-void nmod_poly_mat_swap(nmod_poly_mat_t mat1, nmod_poly_mat_t mat2);
+NMOD_POLY_MAT_INLINE void
+nmod_poly_mat_swap(nmod_poly_mat_t mat1, nmod_poly_mat_t mat2)
+{
+    FLINT_SWAP(nmod_poly_mat_struct, *mat1, *mat2);
+}
 
 NMOD_POLY_MAT_INLINE void
 nmod_poly_mat_swap_entrywise(nmod_poly_mat_t mat1, nmod_poly_mat_t mat2)
@@ -57,25 +61,59 @@ nmod_poly_mat_swap_entrywise(nmod_poly_mat_t mat1, nmod_poly_mat_t mat2)
 
     for (i = 0; i < nmod_poly_mat_nrows(mat1); i++)
         for (j = 0; j < nmod_poly_mat_ncols(mat1); j++)
-            nmod_poly_swap(nmod_poly_mat_entry(mat2, i, j), nmod_poly_mat_entry(mat1, i, j));
+            FLINT_SWAP(nmod_poly_struct, *nmod_poly_mat_entry(mat2, i, j), *nmod_poly_mat_entry(mat1, i, j));
 }
 
 void nmod_poly_mat_set(nmod_poly_mat_t mat1, const nmod_poly_mat_t mat2);
 
+void nmod_poly_mat_set_nmod_mat(nmod_poly_mat_t pmat, const nmod_mat_t cmat);
+
 void nmod_poly_mat_clear(nmod_poly_mat_t mat);
+
+/* Truncate, shift *********************************************************/
+
+void nmod_poly_mat_set_trunc(nmod_poly_mat_t res,
+                             const nmod_poly_mat_t pmat,
+                             long len);
+
+NMOD_POLY_MAT_INLINE
+void nmod_poly_mat_truncate(nmod_poly_mat_t pmat, long len)
+{
+    nmod_poly_mat_set_trunc(pmat, pmat, len);
+}
+
+void nmod_poly_mat_shift_left(nmod_poly_mat_t res,
+                              const nmod_poly_mat_t pmat,
+                              slong k);
+
+void nmod_poly_mat_shift_right(nmod_poly_mat_t res,
+                               const nmod_poly_mat_t pmat,
+                               slong k);
 
 /* Basic properties **********************************************************/
 
-NMOD_POLY_MAT_INLINE mp_limb_t
+NMOD_POLY_MAT_INLINE ulong
 nmod_poly_mat_modulus(const nmod_poly_mat_t mat)
 {
     return mat->modulus;
 }
 
+void nmod_poly_mat_get_coeff_mat(nmod_mat_t coeff,
+                                 const nmod_poly_mat_t pmat,
+                                 slong deg);
+
+void nmod_poly_mat_set_coeff_mat(nmod_poly_mat_t pmat,
+                                 const nmod_mat_t coeff,
+                                 slong deg);
+
+
 /* Comparison ****************************************************************/
 
 int nmod_poly_mat_equal(const nmod_poly_mat_t mat1,
                         const nmod_poly_mat_t mat2);
+
+int nmod_poly_mat_equal_nmod_mat(const nmod_poly_mat_t pmat,
+                                const nmod_mat_t cmat);
 
 int nmod_poly_mat_is_zero(const nmod_poly_mat_t mat);
 
@@ -128,13 +166,20 @@ void nmod_poly_mat_print(const nmod_poly_mat_t mat, const char * x);
 
 slong nmod_poly_mat_max_length(const nmod_poly_mat_t A);
 
+NMOD_POLY_MAT_INLINE
+slong nmod_poly_mat_degree(const nmod_poly_mat_t pmat)
+{
+    return nmod_poly_mat_max_length(pmat)-1;
+}
+
+
 /* Scalar arithmetic *********************************************************/
 
 void nmod_poly_mat_scalar_mul_nmod_poly(nmod_poly_mat_t B,
                     const nmod_poly_mat_t A, const nmod_poly_t c);
 
 void nmod_poly_mat_scalar_mul_nmod(nmod_poly_mat_t B,
-                    const nmod_poly_mat_t A, mp_limb_t c);
+                    const nmod_poly_mat_t A, ulong c);
 
 /* Matrix arithmetic *********************************************************/
 
@@ -170,7 +215,7 @@ void nmod_poly_mat_pow(nmod_poly_mat_t B, const nmod_poly_mat_t A, ulong exp);
 
 /* Evaluation ****************************************************************/
 
-void nmod_poly_mat_evaluate_nmod(nmod_mat_t B, const nmod_poly_mat_t A, mp_limb_t x);
+void nmod_poly_mat_evaluate_nmod(nmod_mat_t B, const nmod_poly_mat_t A, ulong x);
 
 /* Row reduction *************************************************************/
 

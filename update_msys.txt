@@ -8,3 +8,6 @@ pacman -S base-devel            # install/update base-devel
 pacman -S mingw-w64-i686-gcc    # install/update 32bit mingw
 pacman -S mingw-w64-x86_64-gcc  # install/update 64bit mingw
 pacman -S yasm                  # install/update yasm used for MPIR build
+pacman -S m4
+pacman -S make
+pacman -S autotools             # contains autoreconf for Flint bootstrap

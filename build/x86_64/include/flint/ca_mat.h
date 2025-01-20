@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2020 Fredrik Johansson
 
-    This file is part of Calcium.
+    This file is part of FLINT.
 
-    Calcium is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef CA_MAT_H
@@ -15,27 +15,16 @@
 #ifdef CA_MAT_INLINES_C
 #define CA_MAT_INLINE
 #else
-#define CA_MAT_INLINE static __inline__
+#define CA_MAT_INLINE static inline
 #endif
 
-#include "ca_poly.h"
+#include "ca.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Matrix object */
-
-typedef struct
-{
-    ca_ptr entries;
-    slong r;
-    slong c;
-    ca_ptr * rows;
-}
-ca_mat_struct;
-
-typedef ca_mat_struct ca_mat_t[1];
 
 #define ca_mat_entry(mat,i,j) ((mat)->rows[i] + (j))
 #define ca_mat_nrows(mat) ((mat)->r)
@@ -56,9 +45,7 @@ void ca_mat_clear(ca_mat_t mat, ca_ctx_t ctx);
 CA_MAT_INLINE void
 ca_mat_swap(ca_mat_t mat1, ca_mat_t mat2, ca_ctx_t ctx)
 {
-    ca_mat_struct t = *mat1;
-    *mat1 = *mat2;
-    *mat2 = t;
+    FLINT_SWAP(ca_mat_struct, *mat1, *mat2);
 }
 
 /* Window matrices */
@@ -249,19 +236,10 @@ _ca_mat_swap_rows(ca_mat_t mat, slong * perm, slong r, slong s)
 {
     if (r != s)
     {
-        ca_ptr u;
-        slong t;
-
         if (perm != NULL)
-        {
-            t = perm[s];
-            perm[s] = perm[r];
-            perm[r] = t;
-        }
+            FLINT_SWAP(slong, perm[r], perm[s]);
 
-        u = mat->rows[s];
-        mat->rows[s] = mat->rows[r];
-        mat->rows[r] = u;
+        FLINT_SWAP(ca_ptr, mat->rows[r], mat->rows[s]);
     }
 }
 

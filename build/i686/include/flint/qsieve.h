@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -14,12 +14,18 @@
 #define QSIEVE_H
 
 #include <stdint.h>
-#include "thread_pool.h"
 #include "fmpz_types.h"
 
-#ifdef __cplusplus
- extern "C" {
+#if FLINT_USES_PTHREAD
+# include <pthread.h>
 #endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* Windows systems may define `small` macro, which leads to conflicts */
+#undef small
 
 #define QS_DEBUG 0 /* level of debug information printed, 0 = none */
 
@@ -29,7 +35,7 @@
 
 typedef struct
 {
-   mp_limb_t pinv;     /* precomputed inverse */
+   ulong pinv;     /* precomputed inverse */
    int p;              /* prime */
    char size;
 } prime_t;
@@ -50,14 +56,14 @@ typedef struct           /* matrix column */
 
 typedef struct          /* entry in hash table */
 {
-   mp_limb_t prime;    /* value of prime */
-   mp_limb_t next;     /* next prime which have same hash value as 'prime' */
-   mp_limb_t count;    /* number of occurrence of 'prime' */
+   ulong prime;    /* value of prime */
+   ulong next;     /* next prime which have same hash value as 'prime' */
+   ulong count;    /* number of occurrence of 'prime' */
 } hash_t;
 
 typedef struct             /* format for relation */
 {
-   mp_limb_t lp;          /* large prime, is 1, if relation is full */
+   ulong lp;          /* large prime, is 1, if relation is full */
    slong num_factors;     /* number of factors, excluding small factor */
    slong small_primes;   /* number of small factors */
    slong * small;         /* exponent of small factors */
@@ -94,7 +100,7 @@ typedef struct
 
    ulong ks_primes;        /* number of Knuth-Schroeppel primes */
 
-   mp_limb_t k;            /* Multiplier */
+   ulong k;            /* Multiplier */
    fmpz_t kn;              /* kn as a multiprecision integer */
 
    slong num_primes;       /* number of factor base primes including k and 2 */
@@ -117,18 +123,18 @@ typedef struct
    fmpz_t A;                /* current value of coeff A of poly Ax^2 + Bx + C */
    fmpz_t B;                /* B value of poly */
 
-   mp_limb_t * A_ind;       /* indices of factor base primes dividing A */
+   ulong * A_ind;       /* indices of factor base primes dividing A */
 
    fmpz_t * A_divp;         /* A_divp[i] = (A/p_i),
                                where the p_i are the prime factors of A */
-   mp_limb_t * B0_terms;    /* B0_terms[i] = min(gamma_i, p - gamma_i) where
+   ulong * B0_terms;    /* B0_terms[i] = min(gamma_i, p - gamma_i) where
                                gamma_i = (sqrt(kn)*(A_divp[i])^(-1)) mod p_i,
                                where the p_i are the prime factors of A */
 
    fmpz_t * B_terms;        /* B_terms[i] = A_divp[i]*B0_terms[i] (multprec) */
 
-   mp_limb_t * A_inv;       /* A_inv[k] = A^(-1) mod p_k, for FB prime p_k */
-   mp_limb_t ** A_inv2B;    /* A_inv2B[i][k] = 2 * B_terms[i] * A^(-1) mod p_k
+   ulong * A_inv;       /* A_inv[k] = A^(-1) mod p_k, for FB prime p_k */
+   ulong ** A_inv2B;    /* A_inv2B[i][k] = 2 * B_terms[i] * A^(-1) mod p_k
                                for FB prime p_k */
 
    int * soln1;             /* soln1[k] = first poly root mod FB prime p_k */
@@ -153,9 +159,9 @@ typedef struct
    slong h; /* tuple entry we just set, numbered from 1 at end of tuple */
    slong m; /* last value we just set a tuple entry to */
    slong A_ind_diff; /* diff. between indices of (s-1) and (s-2)-th A-factor */
-   mp_limb_t * curr_subset; /* current tuple */
-   mp_limb_t * first_subset; /* first tuple, in case of restart */
-   mp_limb_t j; /* index of s-th factor of first A, if s > 3 */
+   ulong * curr_subset; /* current tuple */
+   ulong * first_subset; /* first tuple, in case of restart */
+   ulong j; /* index of s-th factor of first A, if s > 3 */
 
 #if QS_DEBUG
    slong poly_count;         /* keep track of the number of polynomials used */
@@ -179,7 +185,7 @@ typedef struct
 
    slong table_size;      /* size of table */
    hash_t * table;        /* store 'prime' occurring in partial */
-   mp_limb_t * hash_table;  /* to keep track of location of primes in 'table' */
+   ulong * hash_table;  /* to keep track of location of primes in 'table' */
 
    slong extra_rels;      /* number of extra relations beyond num_primes */
    slong max_factors;     /* maximum number of factors a relation can have */
@@ -225,7 +231,7 @@ typedef qs_s qs_t[1];
 
 #if 0 /* TODO have the tuning values taken from here if multithreaded */
 
-static const mp_limb_t qsieve_tune[][6] =
+static const ulong qsieve_tune[][6] =
 {
    {10,   50,   100,  5,   2 *  2000,  30}, /* */
    {20,   50,   120,  6,   2 *  2500,  30}, /* */
@@ -258,7 +264,7 @@ static const mp_limb_t qsieve_tune[][6] =
 
 #else /* currently tuned for four threads */
 
-static const mp_limb_t qsieve_tune[][6] =
+static const ulong qsieve_tune[][6] =
 {
    {10,   50,   90,  5,   2 *  1500,  18}, /* */
    {20,   50,   90,  6,   2 *  1600,  18}, /* */
@@ -295,24 +301,24 @@ static const mp_limb_t qsieve_tune[][6] =
 #endif
 
 /* number of entries in the tuning table */
-#define QS_TUNE_SIZE (sizeof(qsieve_tune)/(6*sizeof(mp_limb_t)))
+#define QS_TUNE_SIZE (sizeof(qsieve_tune)/(6*sizeof(ulong)))
 
 void qsieve_init(qs_t qs_inf, const fmpz_t n);
 
-mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf);
+ulong qsieve_knuth_schroeppel(qs_t qs_inf);
 
 void qsieve_clear(qs_t qs_inf);
 
 void qsieve_factor(fmpz_factor_t factors, const fmpz_t n);
 
-prime_t * compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf,
+prime_t * compute_factor_base(ulong * small_factor, qs_t qs_inf,
                                                              slong num_primes);
 
-mp_limb_t qsieve_primes_init(qs_t qs_inf);
+ulong qsieve_primes_init(qs_t qs_inf);
 
-mp_limb_t qsieve_primes_increment(qs_t qs_inf, mp_limb_t delta);
+ulong qsieve_primes_increment(qs_t qs_inf, ulong delta);
 
-mp_limb_t qsieve_poly_init(qs_t qs_inf);
+ulong qsieve_poly_init(qs_t qs_inf);
 
 int qsieve_init_A(qs_t qs_inf);
 
@@ -350,14 +356,14 @@ int qsieve_relations_cmp(const void * a, const void * b);
 
 slong qsieve_merge_relations(qs_t qs_inf);
 
-void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime,
-                                                     fmpz_t Y, qs_poly_t poly);
+void qsieve_write_to_file(qs_t qs_inf, ulong prime,
+                                                     const fmpz_t Y, const qs_poly_t poly);
 
-hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime);
+hash_t * qsieve_get_table_entry(qs_t qs_inf, ulong prime);
 
-void qsieve_add_to_hashtable(qs_t qs_inf, mp_limb_t prime);
+void qsieve_add_to_hashtable(qs_t qs_inf, ulong prime);
 
-relation_t qsieve_parse_relation(qs_t qs_inf, char * str);
+relation_t qsieve_parse_relation(qs_t qs_inf);
 
 relation_t qsieve_merge_relation(qs_t qs_inf, relation_t  a, relation_t  b);
 
@@ -370,7 +376,7 @@ void qsieve_insert_relation(qs_t qs_inf, relation_t * rel_list,
 
 int qsieve_process_relation(qs_t qs_inf);
 
-static __inline__ void insert_col_entry(la_col_t * col, slong entry)
+static inline void insert_col_entry(la_col_t * col, slong entry)
 {
    if (((col->weight >> 4) << 4) == col->weight) /* need more space */
    {
@@ -383,7 +389,7 @@ static __inline__ void insert_col_entry(la_col_t * col, slong entry)
    col->weight++;
 }
 
-static __inline__ void swap_cols(la_col_t * col2, la_col_t * col1)
+static inline void swap_cols(la_col_t * col2, la_col_t * col1)
 {
    la_col_t temp;
 
@@ -400,12 +406,12 @@ static __inline__ void swap_cols(la_col_t * col2, la_col_t * col1)
    col2->orig = temp.orig;
 }
 
-static __inline__ void clear_col(la_col_t * col)
+static inline void clear_col(la_col_t * col)
 {
    col->weight = 0;
 }
 
-static __inline__ void free_col(la_col_t * col)
+static inline void free_col(la_col_t * col)
 {
    if (col->weight) flint_free(col->data);
 }

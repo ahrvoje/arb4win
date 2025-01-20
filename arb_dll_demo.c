@@ -1,13 +1,13 @@
 #include <windows.h>
 
 #include "arb.h"
-
+#include "flint.h"
 
 int main()
 {
-    HINSTANCE hArb = LoadLibrary(TEXT("libflint.dll"));
+    HINSTANCE hFlint = LoadLibrary(TEXT("libflint.dll"));
 
-    if (! hArb) {
+    if (! hFlint) {
         printf("Error loading libflint.dll\n");
         printf("Error code: %ld\n", GetLastError());
         printf("https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes\n");
@@ -15,8 +15,7 @@ int main()
         return EXIT_FAILURE;
     }
 
-    char* arb_version_d = *( (char**) GetProcAddress(hArb, "arb_version"));
-    printf("Computed with %d-bit Arb %s\n", sizeof(void*) * 8, arb_version_d);
+    printf("Computed with %d-bit Flint %s\n", sizeof(void*) * 8, FLINT_VERSION);
 
     typedef void(__cdecl *arb_add_t)      (arb_t, arb_t, arb_t, long);
     typedef void(__cdecl *arb_clear_t)    (arb_t);
@@ -28,15 +27,15 @@ int main()
     typedef void(__cdecl *arb_sub_t)      (arb_t, arb_t, arb_t, long);
     typedef void(__cdecl *arb_ui_pow_ui_t)(arb_t, long, long, long);
 
-    arb_add_t       arb_add_d       = (arb_add_t)      GetProcAddress(hArb, "arb_add");
-    arb_clear_t     arb_clear_d     = (arb_clear_t)    GetProcAddress(hArb, "arb_clear");
-    arb_const_e_t   arb_const_e_d   = (arb_const_e_t)  GetProcAddress(hArb, "arb_const_e");
-    arb_init_t      arb_init_d      = (arb_init_t)     GetProcAddress(hArb, "arb_init");
-    arb_pow_t       arb_pow_d       = (arb_pow_t)      GetProcAddress(hArb, "arb_pow");
-    arb_printd_t    arb_printd_d    = (arb_printd_t)   GetProcAddress(hArb, "arb_printd");
-    arb_set_str_t   arb_set_str_d   = (arb_set_str_t)  GetProcAddress(hArb, "arb_set_str");
-    arb_sub_t       arb_sub_d       = (arb_sub_t)      GetProcAddress(hArb, "arb_sub");
-    arb_ui_pow_ui_t arb_ui_pow_ui_d = (arb_ui_pow_ui_t)GetProcAddress(hArb, "arb_ui_pow_ui");
+    arb_add_t       arb_add_d       = (arb_add_t)      GetProcAddress(hFlint, "arb_add");
+    arb_clear_t     arb_clear_d     = (arb_clear_t)    GetProcAddress(hFlint, "arb_clear");
+    arb_const_e_t   arb_const_e_d   = (arb_const_e_t)  GetProcAddress(hFlint, "arb_const_e");
+    arb_init_t      arb_init_d      = (arb_init_t)     GetProcAddress(hFlint, "arb_init");
+    arb_pow_t       arb_pow_d       = (arb_pow_t)      GetProcAddress(hFlint, "arb_pow");
+    arb_printd_t    arb_printd_d    = (arb_printd_t)   GetProcAddress(hFlint, "arb_printd");
+    arb_set_str_t   arb_set_str_d   = (arb_set_str_t)  GetProcAddress(hFlint, "arb_set_str");
+    arb_sub_t       arb_sub_d       = (arb_sub_t)      GetProcAddress(hFlint, "arb_sub");
+    arb_ui_pow_ui_t arb_ui_pow_ui_d = (arb_ui_pow_ui_t)GetProcAddress(hFlint, "arb_ui_pow_ui");
 
     long p = 1000;
     long d = 53;
@@ -74,7 +73,7 @@ int main()
     arb_clear_d(x);
     arb_clear_d(t);
 
-    FreeLibrary(hArb);
+    FreeLibrary(hFlint);
 
     return EXIT_SUCCESS;
 }

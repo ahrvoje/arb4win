@@ -5,18 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef ARITH_H
 #define ARITH_H
-
-#ifdef ARITH_INLINES_C
-#define ARITH_INLINE
-#else
-#define ARITH_INLINE static __inline__
-#endif
 
 #include "fmpq_types.h"
 
@@ -26,8 +20,6 @@
 
 /* Various arithmetic functions **********************************************/
 
-#define arith_primorial fmpz_primorial
-
 void _arith_harmonic_number(fmpz_t num, fmpz_t den, slong n);
 void arith_harmonic_number(fmpq_t x, slong n);
 
@@ -35,10 +27,6 @@ void arith_ramanujan_tau(fmpz_t res, const fmpz_t n);
 void arith_ramanujan_tau_series(fmpz_poly_t res, slong n);
 
 void arith_divisors(fmpz_poly_t res, const fmpz_t n);
-
-#define arith_divisor_sigma fmpz_divisor_sigma
-#define arith_moebius_mu fmpz_moebius_mu
-#define arith_euler_phi fmpz_euler_phi
 
 /* Stirling numbers **********************************************************/
 
@@ -69,7 +57,7 @@ void arith_stirling_matrix_2(fmpz_mat_t mat);
 #define BELL_NUMBER_TAB_SIZE 16
 #endif
 
-FLINT_DLL extern const mp_limb_t bell_number_tab[];
+FLINT_DLL extern const ulong bell_number_tab[];
 
 double arith_bell_number_size(ulong n);
 
@@ -81,12 +69,12 @@ void arith_bell_number_vec(fmpz * b, slong n);
 void arith_bell_number_vec_recursive(fmpz * b, slong n);
 void arith_bell_number_vec_multi_mod(fmpz * b, slong n);
 
-mp_limb_t arith_bell_number_nmod(ulong n, nmod_t mod);
+ulong arith_bell_number_nmod(ulong n, nmod_t mod);
 
-void arith_bell_number_nmod_vec(mp_ptr b, slong n, nmod_t mod);
-void arith_bell_number_nmod_vec_recursive(mp_ptr b, slong n, nmod_t mod);
-int arith_bell_number_nmod_vec_series(mp_ptr b, slong n, nmod_t mod);
-void arith_bell_number_nmod_vec_ogf(mp_ptr res, slong len, nmod_t mod);
+void arith_bell_number_nmod_vec(nn_ptr b, slong n, nmod_t mod);
+void arith_bell_number_nmod_vec_recursive(nn_ptr b, slong n, nmod_t mod);
+int arith_bell_number_nmod_vec_series(nn_ptr b, slong n, nmod_t mod);
+void arith_bell_number_nmod_vec_ogf(nn_ptr res, slong len, nmod_t mod);
 
 
 /* Euler numbers *************************************************************/
@@ -97,7 +85,7 @@ void arith_bell_number_nmod_vec_ogf(mp_ptr res, slong len, nmod_t mod);
 #define SMALL_EULER_LIMIT 15
 #endif
 
-static const mp_limb_t euler_number_small[] = {
+static const ulong euler_number_small[] = {
     UWORD(1), UWORD(1), UWORD(5), UWORD(61), UWORD(1385), UWORD(50521), UWORD(2702765),
     UWORD(199360981),
 #if FLINT64
@@ -142,33 +130,9 @@ void arith_bernoulli_polynomial(fmpq_poly_t poly, ulong n);
 void _arith_bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, slong n);
 void _arith_bernoulli_number_vec_recursive(fmpz * num, fmpz * den, slong n);
 
-/* Cyclotomic polynomials ****************************************************/
-
-#define _arith_cyclotomic_polynomial _fmpz_poly_cyclotomic
-#define arith_cyclotomic_polynomial fmpz_poly_cyclotomic
-
-/* Hypergeometric polynomials ************************************************/
-
-#define _arith_chebyshev_t_polynomial _fmpz_poly_chebyshev_t
-#define arith_chebyshev_t_polynomial fmpz_poly_chebyshev_t
-#define _arith_chebyshev_u_polynomial _fmpz_poly_chebyshev_u
-#define arith_chebyshev_u_polynomial fmpz_poly_chebyshev_u
-
-#define arith_legendre_polynomial fmpq_poly_legendre_p
-
-/* Swinnerton-Dyer polynomials ***********************************************/
-
-#define _arith_swinnerton_dyer_polynomial _fmpz_poly_swinnerton_dyer
-#define arith_swinnerton_dyer_polynomial fmpz_poly_swinnerton_dyer
-
 /* Landau function ***********************************************************/
 
 void arith_landau_function_vec(fmpz * res, slong len);
-
-/* Dedekind sums *************************************************************/
-
-#define arith_dedekind_sum_naive fmpq_dedekind_sum_naive
-#define arith_dedekind_sum fmpq_dedekind_sum
 
 /* Exponential sums **********************************************************/
 
@@ -176,15 +140,15 @@ typedef struct
 {
     int n;
     int prefactor;
-    mp_limb_t sqrt_p;
-    mp_limb_t sqrt_q;
-    mp_limb_signed_t cos_p[FLINT_BITS];
-    mp_limb_t cos_q[FLINT_BITS];
+    ulong sqrt_p;
+    ulong sqrt_q;
+    slong cos_p[FLINT_BITS];
+    ulong cos_q[FLINT_BITS];
 } trig_prod_struct;
 
 typedef trig_prod_struct trig_prod_t[1];
 
-ARITH_INLINE
+FLINT_FORCE_INLINE
 void trig_prod_init(trig_prod_t sum)
 {
     sum->n = 0;
@@ -193,13 +157,13 @@ void trig_prod_init(trig_prod_t sum)
     sum->sqrt_q = 1;
 }
 
-void arith_hrr_expsum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n);
+void arith_hrr_expsum_factored(trig_prod_t prod, ulong k, ulong n);
 
 /* Number of partitions ******************************************************/
 
 FLINT_DLL extern const unsigned int partitions_lookup[128];
 
-void arith_number_of_partitions_nmod_vec(mp_ptr res, slong len, nmod_t mod);
+void arith_number_of_partitions_nmod_vec(nn_ptr res, slong len, nmod_t mod);
 void arith_number_of_partitions_vec(fmpz * res, slong len);
 void arith_number_of_partitions(fmpz_t x, ulong n);
 
@@ -207,6 +171,24 @@ void arith_number_of_partitions(fmpz_t x, ulong n);
 
 void arith_sum_of_squares(fmpz_t r, ulong k, const fmpz_t n);
 void arith_sum_of_squares_vec(fmpz * r, ulong k, slong n);
+
+/* to be deprecated **********************************************************/
+
+#define arith_primorial fmpz_primorial
+#define arith_divisor_sigma fmpz_divisor_sigma
+#define arith_moebius_mu fmpz_moebius_mu
+#define arith_euler_phi fmpz_euler_phi
+#define _arith_cyclotomic_polynomial _fmpz_poly_cyclotomic
+#define arith_cyclotomic_polynomial fmpz_poly_cyclotomic
+#define _arith_chebyshev_t_polynomial _fmpz_poly_chebyshev_t
+#define arith_chebyshev_t_polynomial fmpz_poly_chebyshev_t
+#define _arith_chebyshev_u_polynomial _fmpz_poly_chebyshev_u
+#define arith_chebyshev_u_polynomial fmpz_poly_chebyshev_u
+#define arith_legendre_polynomial fmpq_poly_legendre_p
+#define _arith_swinnerton_dyer_polynomial _fmpz_poly_swinnerton_dyer
+#define arith_swinnerton_dyer_polynomial fmpz_poly_swinnerton_dyer
+#define arith_dedekind_sum_naive fmpq_dedekind_sum_naive
+#define arith_dedekind_sum fmpq_dedekind_sum
 
 #ifdef __cplusplus
 }

@@ -8,7 +8,7 @@
 #             03.04.2017
 #             10.02.2020 - use MSYS2 mingw, not Qt
 #             05.12.2021 - 64bit, MPIR replace GMP, join static&shared MPFR build, auto ABI, check config & make error
-#             06.09.2023 - MPIR removed, check for gcc;m4;make;autoreconf utils and MINGW env, Arb merged into Flint 3.0.0 so no longer built separately
+#             06.09.2023 - MPIR removed, check for gcc;m4;make;autoreconf utils and MINGW env, Arb merged into Flint 3 so no longer built separately
 #
 #  Configuration used at the latest revision:
 #    Windows 11 64-bit
@@ -21,7 +21,7 @@
 #      - install yasm     : pacman -S yasm
 #      - install m4       : pacman -S m4
 #      - install make     : pacman -S make
-#      - install autotools: pacman -S autotools           # contains autoreconf for Flint 3.0.0 bootstrap
+#      - install autotools: pacman -S autotools           # contains autoreconf for Flint bootstrap
 
 [[ $(uname -o) == Msys   ]] || { echo "MSYS platform required. Exiting..."; exit 1; }
 [[ $(uname)    == MINGW* ]] || { echo "MINGW environment required. Exiting..."; exit 1; }
@@ -54,7 +54,7 @@ CHECK_MPFR="no"
 CLEAN_MPFR="no"
 
 # modify if needed
-FLINT=$SOURCE/flint-3.0.0-alpha1
+FLINT=$SOURCE/flint-main
 BUILD_FLINT="yes"
 CHECK_FLINT="no"
 CLEAN_FLINT="no"

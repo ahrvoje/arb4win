@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -27,6 +27,7 @@
 #define TEMPLATE(X,Y) CAT(X,Y)
 #define TEMPLATE3(X,Y,Z) CAT3(X,Y,Z)
 #define TEMPLATE4(X,Y,Z,A) CAT4(X,Y,Z,A)
+#define TEMPLATE5(X,Y,Z,A,B) CAT5(X,Y,Z,A,B)
 #define _TEMPLATE(X,Y) _CAT(X,Y)
 #define _TEMPLATE3(X,Y,Z) _CAT3(X,Y,Z)
 #define _TEMPLATE4(X,Y,Z,A) _CAT4(X,Y,Z,A)

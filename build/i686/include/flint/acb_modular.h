@@ -1,16 +1,22 @@
 /*
     Copyright (C) 2014 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef ACB_MODULAR_H
 #define ACB_MODULAR_H
+
+#ifdef ACB_MODULAR_INLINES_C
+#define ACB_MODULAR_INLINE
+#else
+#define ACB_MODULAR_INLINE static inline
+#endif
 
 #include "fmpz.h"
 #include "acb_types.h"
@@ -30,7 +36,7 @@ psl2z_struct;
 
 typedef psl2z_struct psl2z_t[1];
 
-static __inline__ void
+ACB_MODULAR_INLINE void
 psl2z_init(psl2z_t g)
 {
     fmpz_init(&g->a);
@@ -41,7 +47,7 @@ psl2z_init(psl2z_t g)
     fmpz_one(&g->d);
 }
 
-static __inline__ void
+ACB_MODULAR_INLINE void
 psl2z_clear(psl2z_t g)
 {
     fmpz_clear(&g->a);
@@ -50,15 +56,13 @@ psl2z_clear(psl2z_t g)
     fmpz_clear(&g->d);
 }
 
-static __inline__ void
+ACB_MODULAR_INLINE void
 psl2z_swap(psl2z_t f, psl2z_t g)
 {
-    psl2z_struct h = *f;
-    *f = *g;
-    *g = h;
+    FLINT_SWAP(psl2z_struct, *f, *g);
 }
 
-static __inline__ void
+ACB_MODULAR_INLINE void
 psl2z_set(psl2z_t h, const psl2z_t g)
 {
     fmpz_set(&h->a, &g->a);
@@ -67,7 +71,7 @@ psl2z_set(psl2z_t h, const psl2z_t g)
     fmpz_set(&h->d, &g->d);
 }
 
-static __inline__ void
+ACB_MODULAR_INLINE void
 psl2z_one(psl2z_t g)
 {
     fmpz_one(&g->a);
@@ -82,7 +86,7 @@ void psl2z_fprint(FILE * file, const psl2z_t g);
 
 void psl2z_print(const psl2z_t g);
 
-static __inline__ int
+ACB_MODULAR_INLINE int
 psl2z_equal(const psl2z_t f, const psl2z_t g)
 {
     return fmpz_equal(&f->a, &g->a)
@@ -192,4 +196,3 @@ void _acb_modular_mul(acb_t z, acb_t tmp1, acb_t tmp2, const acb_t x, const acb_
 #endif
 
 #endif
-

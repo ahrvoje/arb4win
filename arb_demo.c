@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #include "arb.h"
-
+#include "flint.h"
 
 int main()
 {
@@ -9,7 +9,7 @@ int main()
     long d = 53;
     arb_t a, b, x, t;
 
-    printf("Computed with %d-bit Arb %s\n", sizeof(void*) * 8, arb_version);
+    printf("Computed with %d-bit Flint %s\n", sizeof(void*) * 8, FLINT_VERSION);
 	
     arb_init(a);
     arb_init(b);
