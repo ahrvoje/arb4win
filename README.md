@@ -4,7 +4,7 @@
 
 GMP, MPFR, FLINT and ARB are well known numerical libraries for large integer and arbitrary precision floating point arithmetic. A special emphasis is given to _ball arithmetic_ library [ARB](https://github.com/fredrik-johansson/arb/) by Frederik Johansson.
 
-**_Arb was merged with Flint 3.0.0 and is not available as a separate library since._**
+**_Arb was merged with Flint 3.0.0 and is not updated as a separate library since._**
 
 The repository doesn't contribute to the functionality. It's just a guide for building 32-bit & 64-bit static and shared libraries for Windows.
 
@@ -15,11 +15,11 @@ The repository doesn't contribute to the functionality. It's just a guide for bu
 - versions used for current builds:
    - GMP v6.3.0 ([https://gmplib.org/](https://gmplib.org/))
    - MPFR v4.2.1 ([http://www.mpfr.org/mpfr-current/](http://www.mpfr.org/mpfr-current/))
-   - FLINT v3.0.0-alpha1 ([http://flintlib.org/downloads.html](http://flintlib.org/downloads.html))
+   - FLINT v3.2.0-dev ([http://flintlib.org/downloads.html](http://flintlib.org/downloads.html))
    - with FLINT hosting ARB ([https://github.com/fredrik-johansson/arb/](https://github.com/fredrik-johansson/arb/))
 - **_build_ARB.sh_**
 
-Cygwin isn't used as it does not handle symbolic links used by some **configure** and **make** scripts in a desirable way, and is generaly not intended to be used as Windows build environment. MSYS2 solves the issues by implementing customized **ln** command which simply creates hard-copies and is designed as a build environment.
+Cygwin isn't used as it does not handle symbolic links used by some **configure** and **make** scripts as expected, and is generaly not intended to be used as a Windows build environment. MSYS2 solves the issues by implementing customized **ln** command which simply creates hard-copies and is designed as a build environment.
 
 ## Workflow
 
